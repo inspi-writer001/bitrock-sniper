@@ -1,0 +1,91 @@
+import axios from "axios";
+import dotenv from "dotenv";
+import { err, log } from "../utils/globals.js";
+import { buyMessage, buyOptions, sellOptions } from "../utils/keyboards.js";
+import { buyAddress, sellAddress } from "../index.js";
+import { findUser } from "../database/users.js";
+import { fetchSpecificTokenBalance } from "./moralis/moralis.js";
+import { fromCustomLamport } from "../utils/converters.js";
+import { getAverageGasLimit } from "./ethers/blockDetails.js";
+
+dotenv.config();
+const env = process.env;
+
+export const buyTrade = async (contractAddress, ctx, sell = false) => {
+  try {
+    let username = ctx.from.id.toString();
+
+    const asynchronous = await Promise.all([
+      findUser(username)
+      // getAverageGasLimit()
+    ]);
+    const user = asynchronous[0];
+    // const gasLimit = asynchronous[1];
+    const userAddress = user.walletAddress;
+    const tokenBalance = await fetchSpecificTokenBalance(
+      userAddress,
+      contractAddress
+    );
+
+    let formattedBalance = fromCustomLamport(
+      tokenBalance[0]?.balance || 0,
+      tokenBalance[0]?.decimals || 0
+    );
+
+    log(formattedBalance);
+    await axios
+      .get(
+        `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/tokens/${contractAddress}`,
+        {
+          headers: {
+            "x-cg-pro-api-key": env.COINGECKO_API_KEY
+          }
+        }
+      )
+      .then(async (response) => {
+        log("===== response from geckoterminal ====");
+        const pool = await axios.get(
+          `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/pools/${
+            response.data.data.relationships.top_pools.data[0].id.split(
+              "bitrock_"
+            )[1]
+          }`,
+          {
+            headers: {
+              "x-cg-pro-api-key": env.COINGECKO_API_KEY
+            }
+          }
+        );
+        const poolData = pool.data.data;
+
+        //   log(response);
+        const body = {
+          balance: Number(formattedBalance).toFixed(3) || 0
+        };
+        const message = buyMessage(response, body, poolData);
+        const option = buyOptions(contractAddress);
+        const sellOption = sellOptions(contractAddress);
+
+        // keyboard
+        sell == true
+          ? await ctx.replyWithHTML(message, sellOption)
+          : await ctx.replyWithHTML(message, option);
+        sell == true
+          ? (sellAddress[username] = response.data.data)
+          : (buyAddress[username] = response.data.data);
+      });
+  } catch (error) {
+    err(error);
+    err("couldn't fetch tokens");
+    log(error);
+    if (error.toString().toLowerCase().includes("moralis")) {
+      await ctx.reply(
+        " something went wrong 😵‍💫 \nplease reselect default address"
+      );
+    } else {
+      await ctx.reply(" couldn't find any tokens there 😵‍💫");
+    }
+  }
+};
+
+// 0x9c0241e7538b35454735ae453423daf470a25b3a
