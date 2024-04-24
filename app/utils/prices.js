@@ -5,7 +5,7 @@ const env = process.env;
 
 export const tokenPrice = async (contractAddress) => {
   const response = await axios.get(
-    `https://pro-api.coingecko.com/api/v3/onchain/networks/eth/tokens/${contractAddress}`,
+    `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/tokens/${contractAddress}`,
     {
       headers: {
         "x-cg-pro-api-key": env.COINGECKO_API_KEY
@@ -20,7 +20,7 @@ export const tokenPrice = async (contractAddress) => {
 
 export const tokenInfo = async (contractAddress) => {
   const response = await axios.get(
-    `https://pro-api.coingecko.com/api/v3/onchain/networks/eth/tokens/${contractAddress}`,
+    `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/tokens/${contractAddress}`,
     {
       headers: {
         "x-cg-pro-api-key": env.COINGECKO_API_KEY
@@ -33,16 +33,19 @@ export const tokenInfo = async (contractAddress) => {
 
 export const EthPrice = async (balance) => {
   if (Number(balance) <= 0) return 0;
+  let contractAddress = "0x413f0E3A440abA7A15137F4278121450416882d5";
   const response = await axios.get(
-    `https://pro-api.coinmarketcap.com/v2/tools/price-conversion?symbol=ETH&amount=${balance}`,
+    `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/tokens/${contractAddress}`,
     {
       headers: {
-        "X-CMC_PRO_API_KEY": process.env.COINMARKET_API_KEY
+        "x-cg-pro-api-key": env.COINGECKO_API_KEY
       }
     }
   );
 
-  const userBalance = response.data.data[0].quote.USD.price.toFixed(3);
+  const userBalance = (
+    Number(response.data.data.attributes.price_usd) * Number(balance)
+  ).toFixed(3);
   return userBalance;
 };
 
@@ -64,7 +67,7 @@ export const EthPriceRaw = async (balance) => {
 export const poolInfo = async (poolAddress, bot) => {
   try {
     const response = await axios.get(
-      `https://pro-api.coingecko.com/api/v3/onchain/networks/eth/pools/${poolAddress}?include=base_token%2Cquote_token`,
+      `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/pools/${poolAddress}?include=base_token%2Cquote_token`,
       {
         headers: {
           "x-cg-pro-api-key": env.COINGECKO_API_KEY

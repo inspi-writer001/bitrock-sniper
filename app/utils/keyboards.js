@@ -42,7 +42,7 @@ export const inlineKeyboard = async (telegramId) => {
     // [Markup.button.callback(" 🔑 Mnemonics ", "button8")],
 
     [
-      Markup.button.webApp(" Help ", "https://curiosityanon.com"),
+      Markup.button.webApp(" Help ", "https://google.com"),
       Markup.button.callback("💰 View Settings ", "button7")
       // Markup.button.callback("🔁 Refresh ", "restart")
     ]
