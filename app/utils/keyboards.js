@@ -217,7 +217,7 @@ export const buyOptions = (contractAddress) =>
     [
       Markup.button.url(
         "📊 Chart ",
-        `https://www.geckoterminal.com/eth/pools/${contractAddress}`
+        `https://www.geckoterminal.com/bitrock/pools/${contractAddress}`
       ),
       Markup.button.callback("❌ Close ", "vanish")
     ]
@@ -226,9 +226,18 @@ export const buyOptions = (contractAddress) =>
 export const sellOptions = (contractAddress) =>
   Markup.inlineKeyboard([
     [
+      Markup.button.callback("⚡️ Sell 10% ", "10p"),
+      Markup.button.callback("⚡️ Sell 20% ", "20p"),
+      Markup.button.callback("⚡️ Sell 30%", "30p")
+    ],
+    [
       Markup.button.callback("⚡️ Sell 50% ", "50p"),
-      Markup.button.callback("⚡️ Sell 100% ", "100p"),
-      Markup.button.callback("⚡️ Sell X", "sell_custom")
+      Markup.button.callback("⚡️ Sell 70% ", "70p"),
+      Markup.button.callback("⚡️ Sell 90%", "90p")
+    ],
+    [
+      Markup.button.callback("⚡️ Sell X", "sell_custom"),
+      Markup.button.callback("⚡️ Sell 100% ", "100p")
     ],
     [
       Markup.button.callback("⏪ Open Trades ", "sell"),
@@ -237,7 +246,7 @@ export const sellOptions = (contractAddress) =>
     [
       Markup.button.url(
         "📊 Chart ",
-        `https://www.geckoterminal.com/eth/pools/${contractAddress}`
+        `https://www.geckoterminal.com/bitrock/pools/${contractAddress}`
       ),
       Markup.button.callback("❌ Close ", "vanish")
     ]
@@ -250,7 +259,7 @@ export const formatNumber = (number) => {
 export const buyMessage = (response, body, poolData) => `
 <b>🌕 ${response.data.data.attributes.name} ($${
   response.data.data.attributes.symbol
-}) 🔗 ETH Token</b>\n<b>LP: <code>${
+}) 🔗 BITROCK Token</b>\n<b>LP: <code>${
   response.data.data.relationships.top_pools.data[0].id.split("eth_")[1]
 }</code>\nCA: <code>${
   response.data.data.attributes.address
