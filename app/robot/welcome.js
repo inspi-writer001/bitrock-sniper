@@ -16,14 +16,12 @@ export const startHandler = async (ctx) => {
     const response = await fetchUser(username);
     const balances = await Promise.all([
       fetchETH(response.wallets[0].address),
-      fetchETH(response.wallets[1].address),
-      fetchETH(response.wallets[2].address)
+      fetchETH(response.wallets[1].address)
     ]);
 
     const prices = await Promise.all([
       EthPrice(balances[0]),
-      EthPrice(balances[1]),
-      EthPrice(balances[2])
+      EthPrice(balances[1])
     ]);
 
     const welcome =
@@ -48,7 +46,7 @@ If you need any help, just type /help.\n` +
       `<code>═══ Your Wallets ═══</code>\n` +
       response.wallets
         .map((e, i) => {
-          return `\b▰ Address ${i + 1}: ▰\n Bal: ${balances[i]} ETH $${
+          return `\b▰ Address ${i + 1}: ▰\n Bal: ${balances[i]} BROCK $${
             prices[i]
           } \n<code>${e.address}</code>\n\n`;
         })
@@ -62,7 +60,7 @@ If you need any help, just type /help.\n` +
     );
   } catch (error) {
     console.log(error);
-    const ErrorMessage = ` Something went wrong,
+    const ErrorMessage = `Something went wrong,
 
 ${
   error.toString().includes("timed out")

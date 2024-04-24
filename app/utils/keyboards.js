@@ -23,11 +23,11 @@ export const inlineKeyboard = async (telegramId) => {
       Markup.button.callback(
         `${userDefaultWallet == 1 ? "✅" : ""} w2 `,
         "selectWallet:w2"
-      ),
-      Markup.button.callback(
-        `${userDefaultWallet == 2 ? "✅" : ""} w3 `,
-        "selectWallet:w3"
       )
+      // Markup.button.callback(
+      //   `${userDefaultWallet == 2 ? "✅" : ""} w3 `,
+      //   "selectWallet:w3"
+      // )
     ],
     [
       Markup.button.callback("🟢 Buy ", "buy"),
@@ -96,8 +96,8 @@ export const selectWallet = Markup.inlineKeyboard([
   [Markup.button.callback(" SELECT WALLET TO USE ", "selectWallet")],
   [
     Markup.button.callback(" w1 ", "selectWallet1"),
-    Markup.button.callback(" w2 ", "selectWallet2"),
-    Markup.button.callback(" w3 ", "selectWallet3")
+    Markup.button.callback(" w2 ", "selectWallet2")
+    // Markup.button.callback(" w3 ", "selectWallet3")
   ]
 ]);
 

@@ -19,10 +19,6 @@ export const createWallet12 = async (telegramId) => {
     {
       address: existingUser.wallets[1].address,
       privateKey: decrypt(existingUser.wallets[1].privateKey)
-    },
-    {
-      address: existingUser.wallets[2].address,
-      privateKey: decrypt(existingUser.wallets[2].privateKey)
     }
   ];
   return wallets;
