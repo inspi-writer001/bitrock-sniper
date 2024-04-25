@@ -135,7 +135,7 @@ bot.action("resetSellLoAmount", doClearSellLoAmount);
 bot.action("button7", pullUpViewSettings);
 bot.action("selectWallet:w1", selectWallet1);
 bot.action("selectWallet:w2", selectWallet2);
-bot.action("selectWallet:w3", selectWallet3);
+// bot.action("selectWallet:w3", selectWallet3);
 bot.action("editMinMCap", eeditMinMCap);
 bot.action("editMaxMCap", eeditMaxMCap);
 bot.action("editMinLiquidity", eeditMinLiquidity);

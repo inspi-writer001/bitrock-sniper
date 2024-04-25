@@ -7,6 +7,35 @@ dotenv.config();
 
 const chain = EvmChain.ETHEREUM;
 
+// console.log(chain.toJSON());
+
+// const chain = {
+//   _value: "0x1c03",
+//   _chainlistData: {
+//     name: "Bitrock Mainnet",
+//     chain: "BITROCK",
+//     icon: "bitrock",
+//     rpc: ["https://brockrpc.io", "https://connect.bit-rock.io"],
+//     features: [{ name: "EIP155" }, { name: "EIP1559" }],
+//     faucets: [],
+//     nativeCurrency: { name: "Bitrock", symbol: "BROCK", decimals: 18 },
+//     infoURL: "https://www.bit-rock.io",
+//     shortName: "bitrock",
+//     chainId: 7171,
+//     networkId: 7171,
+//     slip44: 60,
+//     ens: { registry: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e" },
+//     explorers: [
+//       {
+//         name: "blockscout",
+//         url: "https://explorer.bit-rock.io",
+//         icon: "blockscout",
+//         standard: "EIP3091"
+//       }
+//     ]
+//   }
+// };
+
 export const connectToMoralis = async () => {
   try {
     await Moralis.start({
@@ -24,6 +53,7 @@ export const connectToMoralis = async () => {
 
 export const fetchTokenBalances = async (address) => {
   log(chain);
+  log(chain._chainlistData);
   const response = await Moralis.EvmApi.token.getWalletTokenBalances({
     address: address,
     chain: chain
