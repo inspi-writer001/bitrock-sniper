@@ -47,10 +47,7 @@ import {
   eeditSellLoAmount,
   eeditSellLox
 } from "./robot/eedits.js";
-import {
-  connectToMoralis,
-  fetchTokenPrice
-} from "./controllers/moralis/moralis.js";
+
 import { buy } from "./robot/buy.js";
 import { log } from "./utils/globals.js";
 import { sell } from "./robot/sell.js";
@@ -106,7 +103,7 @@ bot.use((ctx, next) => {
 });
 
 // connecting to mongodb
-await connectToMoralis();
+
 await MongoConnect().then(async (e) => {
   await preSnipeAction(bot.telegram);
 });

@@ -1,67 +1,39 @@
-import Moralis from "moralis";
-import { EvmChain } from "@moralisweb3/common-evm-utils";
 import dotenv from "dotenv";
 import { fromCustomLamport } from "../../utils/converters.js";
 import { err, log } from "../../utils/globals.js";
 dotenv.config();
+import axios from "axios";
 
-const chain = EvmChain.ETHEREUM;
+const env = process.env;
+const baseUrl = "https://explorer.bit-rock.io/api/v2";
 
-// console.log(chain.toJSON());
-
-// const chain = {
-//   _value: "0x1c03",
-//   _chainlistData: {
-//     name: "Bitrock Mainnet",
-//     chain: "BITROCK",
-//     icon: "bitrock",
-//     rpc: ["https://brockrpc.io", "https://connect.bit-rock.io"],
-//     features: [{ name: "EIP155" }, { name: "EIP1559" }],
-//     faucets: [],
-//     nativeCurrency: { name: "Bitrock", symbol: "BROCK", decimals: 18 },
-//     infoURL: "https://www.bit-rock.io",
-//     shortName: "bitrock",
-//     chainId: 7171,
-//     networkId: 7171,
-//     slip44: 60,
-//     ens: { registry: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e" },
-//     explorers: [
-//       {
-//         name: "blockscout",
-//         url: "https://explorer.bit-rock.io",
-//         icon: "blockscout",
-//         standard: "EIP3091"
-//       }
-//     ]
+// {
+//     "token_address": "0xefd6c64533602ac55ab64442307f6fe2c9307305",
+//     "name": "APE",
+//     "symbol": "APE",
+//     "logo": null,
+//     "thumbnail": null,
+//     "decimals": 18,
+//     "balance": "101715701444169451516503179"
 //   }
-// };
-
-export const connectToMoralis = async () => {
-  try {
-    await Moralis.start({
-      apiKey: process.env.MORALIS_API
-      // ...and any other configuration
-    });
-    log("=====================================");
-    log("=====================================");
-    log("connected to moralis successfully");
-  } catch (error) {
-    err("======= error connectng to moralis ====");
-    err(error);
-  }
-};
 
 export const fetchTokenBalances = async (address) => {
-  log(chain);
-  log(chain._chainlistData);
-  const response = await Moralis.EvmApi.token.getWalletTokenBalances({
-    address: address,
-    chain: chain
-  });
+  const preResponse = await axios.get(
+    `${baseUrl}/addresses/${address}/token-balances`
+  );
+  const response = preResponse.data.map((e, i) => ({
+    token_address: e.token.address,
+    name: e.token.name,
+    symbol: e.token.symbol,
+    decimals: e.token.decimals,
+    logo: e.token.icon_url,
+    thumbnail: e.token.icon_url,
+    balance: e.value
+  }));
 
   let promises = [];
 
-  const balances = response.toJSON();
+  const balances = response;
 
   let sortedAmount = [];
 
@@ -88,34 +60,75 @@ export const fetchTokenBalances = async (address) => {
   return sortedAmount;
 };
 
-export const fetchSpecificTokenBalance = async (address, contractAddress) => {
-  // TODO remove test token contract address
-  const response = await Moralis.EvmApi.token.getWalletTokenBalances({
-    address: address,
-    tokenAddresses: [contractAddress],
-    chain: chain
-  });
+log(fetchTokenBalances("0xb3049c4C314FA534E691369f0c4E7BA79bb2BD58"));
 
-  // log(response.toJSON());
-  return response.toJSON();
+// [
+//   {
+//     token_address: "0xefd6c64533602ac55ab64442307f6fe2c9307305",
+//     name: "APE",
+//     symbol: "APE",
+//     logo: null,
+//     thumbnail: null,
+//     decimals: 18,
+//     balance: "101715701444169451516503179"
+//   }
+// ];
+
+export const fetchSpecificTokenBalance = async (address, contractAddress) => {
+  const preResponse = await axios.get(
+    `${baseUrl}/addresses/${address}/token-balances`
+  );
+  const response = preResponse.data.filter(
+    (e, i) => e.token.address == contractAddress
+  );
+
+  if (response.length === 0) {
+    throw new Error("Token not found");
+  }
+
+  const singleToken = {
+    token_address: response[0].token.address,
+    name: response[0].token.name,
+    symbol: response[0].token.symbol,
+    decimals: response[0].token.decimals,
+    logo: response[0].token.icon_url,
+    thumbnail: response[0].token.icon_url,
+    balance: response[0].value
+  };
+
+  return [singleToken];
 };
 
 export const fetchTokenPrice = async (contractAddress) => {
-  const response = await Moralis.EvmApi.token.getTokenPrice({
-    address: contractAddress,
-    chain
-  });
-
-  return response.toJSON().usdPrice;
+  const response = await axios.get(
+    `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/tokens/${contractAddress}`,
+    {
+      headers: {
+        "x-cg-pro-api-key": env.COINGECKO_API_KEY
+      }
+    }
+  );
+  const usdPrice = response.data.data.attributes.price_usd;
+  return usdPrice;
 };
 
-export const fetchTokenDetails = async (contractAddress) => {
-  // log("fetching specific token details");
-  const response = await Moralis.EvmApi.token.getTokenMetadata({
-    chain,
-    addresses: [contractAddress]
-  });
+// {
+//     "address": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+//     "name": "Uniswap",
+//     "symbol": "UNI",
+//     "decimals": "18",
+//     "logo": "https://cdn.moralis.io/eth/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.webp",
+//     "logo_hash": "064ee9557deba73c1a31014a60f4c081284636b785373d4ccdd1b3440df11f43",
+//     "thumbnail": "https://cdn.moralis.io/eth/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984_thumb.webp",
+//     "block_number": null,
+//     "validated": null,
+//     "created_at": "2022-01-20T10:39:55.818Z"
+//   }
 
-  log(response.toJSON());
-  return response.toJSON();
+export const fetchTokenDetails = async (contractAddress) => {
+  const preResponse = await axios.get(`${baseUrl}/tokens/${contractAddress}`);
+  const dataResponse = preResponse.data;
+  const response = [dataResponse];
+
+  return response;
 };
