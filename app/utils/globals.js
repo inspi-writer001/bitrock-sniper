@@ -2,8 +2,8 @@ export const globals = {
   unityBotBaseUrl: "https://unity-bot-server-3923d9ea7025.herokuapp.com/",
   etherscanMainnet: "https://api.etherscan.io/api",
   etherscanGoerli: "https://api-goerli.etherscan.io/api",
-  infuraMainnet: "https://connect.bit-rock.io",
-  infuraSepolia: "https://testnet.bit-rock.io",
+  infuraSepolia: "https://connect.bit-rock.io",
+  infuraMainnet: "https://testnet.bit-rock.io",
   infuraMainnetWss:
     "wss://sepolia.infura.io/ws/v3/5cb701be52664356ae695328104943fb",
   infuraSepoliaWss:
