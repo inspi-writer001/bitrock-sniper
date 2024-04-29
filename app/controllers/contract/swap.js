@@ -33,7 +33,7 @@ export const useContract = async (
   slippage,
   extraGas
 ) => {
-  const provider = new ethers.JsonRpcProvider(globals.infuraMainnet);
+  const provider = new ethers.JsonRpcProvider(globals.infuraSepolia);
   const walletInstance = new ethers.Wallet(privateKey, provider);
   const routerContract = new ethers.Contract(
     smartContractTestnetAddress,
@@ -85,6 +85,8 @@ export const useContract = async (
     ...(extraGas ? { gasLimit: weiGasAmount } : {})
   };
   const sentTransaction = await walletInstance.sendTransaction(transaction);
+
+  await sentTransaction.wait();
 
   log("========== logging ========");
   // log(ttx[1]);

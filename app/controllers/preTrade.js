@@ -117,7 +117,7 @@ export const preSnipeAction = async (bot) => {
                 await changePreSnipeState(currentTrade.username, tokenOut, 1);
                 await bot.sendMessage(
                   currentUser.username,
-                  `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://etherscan.io/tx/${tookTrade.hash}"> view on explorer  ${tookTrade.hash} </a>`,
+                  `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer  ${tookTrade.hash} </a>`,
                   { parse_mode: "HTML" }
                 );
               } catch (errr) {

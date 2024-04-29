@@ -260,7 +260,7 @@ export const buyMessage = (response, body, poolData) => `
 <b>🌕 ${response.data.data.attributes.name} ($${
   response.data.data.attributes.symbol
 }) 🔗 BITROCK Token</b>\n<b>LP: <code>${
-  response.data.data.relationships.top_pools.data[0].id.split("eth_")[1]
+  response.data.data.relationships.top_pools.data[0].id.split("bitrock_")[1]
 }</code>\nCA: <code>${
   response.data.data.attributes.address
 }</code>\nV2</b> Pool\n\n

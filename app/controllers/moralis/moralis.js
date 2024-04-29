@@ -60,7 +60,7 @@ export const fetchTokenBalances = async (address) => {
   return sortedAmount;
 };
 
-log(fetchTokenBalances("0xb3049c4C314FA534E691369f0c4E7BA79bb2BD58"));
+// log(fetchTokenBalances("0xb3049c4C314FA534E691369f0c4E7BA79bb2BD58"));
 
 // [
 //   {
@@ -75,28 +75,41 @@ log(fetchTokenBalances("0xb3049c4C314FA534E691369f0c4E7BA79bb2BD58"));
 // ];
 
 export const fetchSpecificTokenBalance = async (address, contractAddress) => {
-  const preResponse = await axios.get(
-    `${baseUrl}/addresses/${address}/token-balances`
-  );
-  const response = preResponse.data.filter(
-    (e, i) => e.token.address == contractAddress
-  );
+  try {
+    const preResponse = await axios.get(
+      `${baseUrl}/addresses/${address}/token-balances`
+    );
+    const response = preResponse.data.filter(
+      (e, i) => e.token.address == contractAddress
+    );
 
-  if (response.length === 0) {
-    throw new Error("Token not found");
+    if (response.length === 0) {
+      throw new Error("Token not found");
+    }
+
+    const singleToken = {
+      token_address: response[0].token.address,
+      name: response[0].token.name,
+      symbol: response[0].token.symbol,
+      decimals: response[0].token.decimals,
+      logo: response[0].token.icon_url,
+      thumbnail: response[0].token.icon_url,
+      balance: response[0].value
+    };
+
+    return [singleToken];
+  } catch (error) {
+    const singleToken = {
+      token_address: contractAddress,
+      name: "",
+      symbol: "",
+      decimals: 0,
+      logo: "",
+      thumbnail: "",
+      balance: 0
+    };
+    return singleToken;
   }
-
-  const singleToken = {
-    token_address: response[0].token.address,
-    name: response[0].token.name,
-    symbol: response[0].token.symbol,
-    decimals: response[0].token.decimals,
-    logo: response[0].token.icon_url,
-    thumbnail: response[0].token.icon_url,
-    balance: response[0].value
-  };
-
-  return [singleToken];
 };
 
 export const fetchTokenPrice = async (contractAddress) => {

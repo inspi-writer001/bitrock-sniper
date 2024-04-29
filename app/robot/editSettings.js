@@ -177,7 +177,7 @@ const customBuyForSpecificUser = async (username, customValue, ctx) => {
       state[username].trade.slippage
     );
     await ctx.replyWithHTML(
-      `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://etherscan.io/tx/${result.hash}"> view on explorer ${result.hash}  </a>`
+      `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${result.hash}"> view on explorer ${result.hash}  </a>`
     );
     // await ctx.replyWithHTML(
     //   `<b> fetching your portfolio details ♻️ ===== </b>`
@@ -223,7 +223,7 @@ export const customSellForSpecificUser = async (username, customValue, ctx) => {
       ctx
     );
     await ctx.replyWithHTML(
-      `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://etherscan.io/tx/${result.hash}"> view on explorer ${result.hash}  </a>`,
+      `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${result.hash}"> view on explorer ${result.hash}  </a>`,
       fastKeyboard
     );
     return;

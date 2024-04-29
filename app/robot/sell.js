@@ -85,7 +85,7 @@ export const sell = async (ctx) => {
 
       // TODO change snowtrace
       await ctx.replyWithHTML(
-        `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://etherscan.io/tx/${result.hash}"> view on explorer ${result.hash}  </a>`,
+        `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${result.hash}"> view on explorer ${result.hash}  </a>`,
         fastKeyboard
       );
 
