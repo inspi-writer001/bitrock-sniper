@@ -147,7 +147,10 @@ bot.action("editBuyAmount", eeditBuyAmount);
 bot.action(["buyXAmount", "buyPercentage"], doSwitchBuyType);
 bot.action(["0.05", "0.1", "buy_custom"], buy);
 bot.action("sell", sellMenu);
-bot.action(["50p", "100p", "sell_custom"], sell);
+bot.action(
+  ["10p", "20p", "30p", "50p", "70p", "90p", "100p", "sell_custom"],
+  sell
+);
 bot.action("vanish", vanish);
 bot.action("mainMenu", startHandler);
 bot.action("buy", buyPrompt);
