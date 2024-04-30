@@ -269,7 +269,6 @@ export const buyMessage = (response, body, poolData) => `
   response.data.data.attributes.total_supply
 )} ${response.data.data.attributes.symbol}
 <b>💰 Balance</b>           | ${body.balance}
-<b>💵 TX Fees</b>           | Ⓑ $24.88 ⓢ $11.73
 <b>💧 Liquidity</b>         | $${poolData.attributes["reserve_in_usd"]}
 <b>💪 MC/Liq</b>            | ${(
   Number(
