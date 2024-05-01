@@ -10,6 +10,8 @@ import {
   fetchTokenBalances,
   fetchTokenDetails
 } from "../controllers/moralis/moralis.js";
+import { millify } from "millify";
+import { fromCustomLamport } from "./converters.js";
 
 export const inlineKeyboard = async (telegramId) => {
   const userDefaultWallet = await fetchDefaultWallet(telegramId);
@@ -252,8 +254,24 @@ export const sellOptions = (contractAddress) =>
     ]
   ]);
 
-export const formatNumber = (number) => {
-  return numeral(+number).format("00.00a");
+export const formatNumber = (bigInt) => {
+  // log(millify(200e5));
+  // return millify(Number(number));
+
+  const strBigInt = bigInt.toString();
+  const absBigInt = BigInt(strBigInt < 0 ? strBigInt.slice(1) : strBigInt);
+
+  if (absBigInt < 1000n) {
+    return absBigInt.toString();
+  } else if (absBigInt < 1000000n) {
+    return (absBigInt / 1000n).toString() + "K";
+  } else if (absBigInt < 1000000000n) {
+    return (absBigInt / 1000000n).toString() + "M";
+  } else if (absBigInt < 1000000000000n) {
+    return (absBigInt / 1000000000n).toString() + "B";
+  } else {
+    return (absBigInt / 1000000000000n).toString() + "T";
+  }
 };
 
 export const buyMessage = (response, body, poolData) => `
@@ -264,23 +282,28 @@ export const buyMessage = (response, body, poolData) => `
 }</code>\nCA: <code>${
   response.data.data.attributes.address
 }</code>\nV2</b> Pool\n\n
-<b>🔺 Price</b>                | $${response.data.data.attributes.price_usd}
+<b>🔺 Price</b>                 | $${response.data.data.attributes.price_usd}
 <b>🗄 Total Supply</b>  | ${formatNumber(
-  response.data.data.attributes.total_supply
+  fromCustomLamport(
+    response.data.data.attributes.total_supply,
+    response.data.data.attributes.decimals
+  )
 )} ${response.data.data.attributes.symbol}
 <b>💰 Balance</b>           | ${body.balance}
 <b>💧 Liquidity</b>         | $${poolData.attributes["reserve_in_usd"]}
-<b>💪 MC/Liq</b>            | ${(
+<b>💪 MC/Liq</b>             | ${formatNumber(
   Number(
     +response.data.data.attributes.market_cap_usd ||
       +response.data.data.attributes.price_usd *
         +response.data.data.attributes.total_supply
   ) / Number(poolData.attributes["reserve_in_usd"])
-).toFixed(2)}
+)}
 <b>🧢 Market Cap</b>    | $${formatNumber(
-  response.data.data.attributes.market_cap_usd ||
-    +response.data.data.attributes.price_usd *
-      +response.data.data.attributes.total_supply
+  BigInt(
+    response.data.data.attributes.market_cap_usd ||
+      +response.data.data.attributes.price_usd *
+        +response.data.data.attributes.total_supply
+  )
 )}`;
 
 {
