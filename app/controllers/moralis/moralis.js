@@ -108,7 +108,7 @@ export const fetchSpecificTokenBalance = async (address, contractAddress) => {
       thumbnail: "",
       balance: 0
     };
-    return singleToken;
+    return [singleToken];
   }
 };
 
