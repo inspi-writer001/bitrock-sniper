@@ -79,9 +79,18 @@ export const fetchSpecificTokenBalance = async (address, contractAddress) => {
     const preResponse = await axios.get(
       `${baseUrl}/addresses/${address}/token-balances`
     );
-    const response = preResponse.data.filter(
-      (e, i) => e.token.address == contractAddress
-    );
+    const response = preResponse.data.map((e, i) => {
+      log(e.token);
+      log(contractAddress);
+      if (e.token.address == contractAddress) {
+        log(" ================ yes ================");
+        log(preResponse.data[i]);
+        return preResponse.data[i];
+      } else {
+        log("==== noooo ===");
+        return [];
+      }
+    });
 
     if (response.length === 0) {
       throw new Error("Token not found");
@@ -99,6 +108,8 @@ export const fetchSpecificTokenBalance = async (address, contractAddress) => {
 
     return [singleToken];
   } catch (error) {
+    log("=============== error fetching balance ==");
+    log(error);
     const singleToken = {
       token_address: contractAddress,
       name: "",

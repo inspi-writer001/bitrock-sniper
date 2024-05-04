@@ -112,6 +112,9 @@ export const swapBack = async (
     contractAddress
   );
 
+  log("responseBAlance =================");
+  log(responseBalance);
+
   const userBalance = fromCustomLamport(
     responseBalance[0].balance,
     responseBalance[0].decimals
@@ -119,7 +122,9 @@ export const swapBack = async (
 
   const amountToSell = toCustomLamport(amount, responseBalance[0].decimals);
   log(" ======= amount to sell in its decimals ========= ");
+
   log(amountToSell);
+  log(userBalance);
 
   const settledBalance =
     percent === true
@@ -128,6 +133,8 @@ export const swapBack = async (
           responseBalance[0].decimals
         )
       : amountToSell;
+
+  log(settledBalance);
   const settledBalanceForApprove =
     percent === true ? (amount / 100) * Number(userBalance).toFixed(3) : amount;
 

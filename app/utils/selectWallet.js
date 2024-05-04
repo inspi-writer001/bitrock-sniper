@@ -8,8 +8,8 @@ const inlineKeyboard = Markup.inlineKeyboard([
   [Markup.button.callback(" SELECT DEFAULT WALLET ", "selectWallet")],
   [
     Markup.button.callback(" w1 ", "selectWallet:w1"),
-    Markup.button.callback(" w2 ", "selectWallet:w2"),
-    Markup.button.callback(" w3 ", "selectWallet:w3")
+    Markup.button.callback(" w2 ", "selectWallet:w2")
+    // Markup.button.callback(" w3 ", "selectWallet:w3")
   ],
   [
     Markup.button.callback("🟢 Buy ", "buy"),

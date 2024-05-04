@@ -65,10 +65,13 @@ export const sell = async (ctx) => {
     log("valid amount ", validAmount);
 
     // TODO remove test contract address
+    log("===response ==");
+    log(response);
 
     try {
       await ctx.reply("processing tx ⚡️ ==========");
       await ctx.reply("processing gas ⛽️ ==========");
+
       const result = await swapBack(
         userAddress,
         response.attributes.address,
@@ -79,8 +82,7 @@ export const sell = async (ctx) => {
         validAmount,
         "",
         true,
-        ctx,
-        username
+        ctx
       );
 
       // TODO change snowtrace
