@@ -15,6 +15,8 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
   try {
     let username = ctx.from.id.toString();
 
+    log(contractAddress);
+
     const asynchronous = await Promise.all([
       findUser(username)
       // getAverageGasLimit()
@@ -22,6 +24,7 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
     const user = asynchronous[0];
     // const gasLimit = asynchronous[1];
     const userAddress = user.walletAddress;
+
     const tokenBalance = await fetchSpecificTokenBalance(
       userAddress,
       contractAddress

@@ -74,23 +74,112 @@ export const fetchTokenBalances = async (address) => {
 //   }
 // ];
 
+// export const fetchSpecificTokenBalance = async (address, contractAddress) => {
+//   try {
+//     const response = await axios.get(
+//       `${baseUrl}/addresses/${address}/token-balances`
+//     );
+
+//     log(response.data);
+//     const token = response.data.find(
+//       (e) => e.token.address === contractAddress
+//     );
+//     log("token ===");
+//     log(token);
+
+//     if (!token) {
+//       throw new Error("Token not found");
+//     }
+
+//     const singleToken = {
+//       token_address: token.token.address,
+//       name: token.token.name,
+//       symbol: token.token.symbol,
+//       decimals: token.token.decimals,
+//       logo: token.token.icon_url,
+//       thumbnail: token.token.icon_url,
+//       balance: token.value
+//     };
+
+//     return [singleToken];
+//   } catch (error) {
+//     console.error("Error fetching balance:", error);
+//     const singleToken = {
+//       token_address: contractAddress,
+//       name: "",
+//       symbol: "",
+//       decimals: 0,
+//       logo: "",
+//       thumbnail: "",
+//       balance: 0
+//     };
+//     return [singleToken];
+//   }
+// };
+
+// export const fetchSpecificTokenBalance = async (address, contractAddress) => {
+//   try {
+//     const preResponse = await axios.get(
+//       `${baseUrl}/addresses/${address}/token-balances`
+//     );
+//     const response = preResponse.data.map((e, i) => {
+//       log(e.token.address);
+//       log(contractAddress);
+//       if (e.token.address == contractAddress) {
+//         log(" ================ yes ================");
+//         log(e);
+//         return e;
+//       } else {
+//         log("==== noooo ===");
+//         return [];
+//       }
+//     });
+
+//     if (response.length === 0) {
+//       throw new Error("Token not found");
+//     }
+
+//     const singleToken = {
+//       token_address: response[0].token.address,
+//       name: response[0].token.name,
+//       symbol: response[0].token.symbol,
+//       decimals: response[0].token.decimals,
+//       logo: response[0].token.icon_url,
+//       thumbnail: response[0].token.icon_url,
+//       balance: response[0].value
+//     };
+
+//     return [singleToken];
+//   } catch (error) {
+//     log("=============== error fetching balance ==");
+//     log(error);
+//     const singleToken = {
+//       token_address: contractAddress,
+//       name: "",
+//       symbol: "",
+//       decimals: 0,
+//       logo: "",
+//       thumbnail: "",
+//       balance: 0
+//     };
+//     return [singleToken];
+//   }
+// };
+
 export const fetchSpecificTokenBalance = async (address, contractAddress) => {
   try {
     const preResponse = await axios.get(
       `${baseUrl}/addresses/${address}/token-balances`
     );
-    const response = preResponse.data.map((e, i) => {
-      log(e.token);
-      log(contractAddress);
-      if (e.token.address == contractAddress) {
-        log(" ================ yes ================");
-        log(preResponse.data[i]);
-        return preResponse.data[i];
-      } else {
-        log("==== noooo ===");
-        return [];
-      }
-    });
+
+    log(contractAddress);
+    log(preResponse.data);
+    const response = await preResponse.data.filter(
+      (e) => contractAddress.toLowerCase() === e.token.address.toLowerCase()
+    );
+
+    log(" ==== response ====");
+    log(response);
 
     if (response.length === 0) {
       throw new Error("Token not found");
@@ -108,8 +197,7 @@ export const fetchSpecificTokenBalance = async (address, contractAddress) => {
 
     return [singleToken];
   } catch (error) {
-    log("=============== error fetching balance ==");
-    log(error);
+    console.error("Error fetching balance:", error);
     const singleToken = {
       token_address: contractAddress,
       name: "",
@@ -122,6 +210,13 @@ export const fetchSpecificTokenBalance = async (address, contractAddress) => {
     return [singleToken];
   }
 };
+
+// log(
+//   await fetchSpecificTokenBalance(
+//     "0xc0dC9A9Cd4FF82411a74c0C903A2e098EF772c6F",
+//     "0xaa72d86210ac33bca2de6139403f9af37398e721"
+//   )
+// );
 
 export const fetchTokenPrice = async (contractAddress) => {
   const response = await axios.get(

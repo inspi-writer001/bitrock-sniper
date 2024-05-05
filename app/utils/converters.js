@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 export const toCustomLamport = (amount, decimals) => {
   const value = ethers.parseUnits(
     Number(amount).toFixed(3).toString(),
-    decimals
+    Number(decimals)
   );
   return value;
 };

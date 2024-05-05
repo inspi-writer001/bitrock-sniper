@@ -71,7 +71,6 @@ export const sell = async (ctx) => {
     try {
       await ctx.reply("processing tx ⚡️ ==========");
       await ctx.reply("processing gas ⛽️ ==========");
-
       const result = await swapBack(
         userAddress,
         response.attributes.address,

@@ -109,10 +109,11 @@ export const swapBack = async (
   const provider = new ethers.JsonRpcProvider(globals.infuraSepolia);
   const responseBalance = await fetchSpecificTokenBalance(
     userAddress,
-    contractAddress
+    contractAddress.toString()
   );
+  log(contractAddress);
 
-  log("responseBAlance =================");
+  log("responseBalance =================");
   log(responseBalance);
 
   const userBalance = fromCustomLamport(
