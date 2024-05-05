@@ -274,6 +274,10 @@ export const formatNumber = (bigInt) => {
   }
 };
 
+export const formatNormalNumber = (number) => {
+  return millify(Number(number));
+};
+
 export const buyMessage = (response, body, poolData) => `
 <b>🌕 ${response.data.data.attributes.name} ($${
   response.data.data.attributes.symbol
@@ -291,19 +295,14 @@ export const buyMessage = (response, body, poolData) => `
 )} ${response.data.data.attributes.symbol}
 <b>💰 Balance</b>           | ${body.balance}
 <b>💧 Liquidity</b>         | $${poolData.attributes["reserve_in_usd"]}
-<b>💪 MC/Liq</b>             | ${formatNumber(
-  Number(
-    +response.data.data.attributes.market_cap_usd ||
-      +response.data.data.attributes.price_usd *
-        +response.data.data.attributes.total_supply
-  ) / Number(poolData.attributes["reserve_in_usd"])
+<b>💪 MC/Liq</b>             | ${formatNormalNumber(
+  (
+    Number(response.data.data.attributes.fdv_usd) /
+    Number(poolData.attributes["reserve_in_usd"])
+  ).toFixed(3)
 )}
 <b>🧢 Market Cap</b>    | $${formatNumber(
-  BigInt(
-    response.data.data.attributes.market_cap_usd ||
-      +response.data.data.attributes.price_usd *
-        +response.data.data.attributes.total_supply
-  )
+  BigInt(response.data.data.attributes.fdv_usd)
 )}`;
 
 {
