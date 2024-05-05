@@ -291,7 +291,7 @@ export const buyMessage = (response, body, poolData) => `
   fromCustomLamport(
     response.data.data.attributes.total_supply,
     response.data.data.attributes.decimals
-  )
+  ).toFixed(0)
 )} ${response.data.data.attributes.symbol}
 <b>💰 Balance</b>           | ${body.balance}
 <b>💧 Liquidity</b>         | $${poolData.attributes["reserve_in_usd"]}
@@ -302,7 +302,7 @@ export const buyMessage = (response, body, poolData) => `
   ).toFixed(3)
 )}
 <b>🧢 Market Cap</b>    | $${formatNumber(
-  BigInt(response.data.data.attributes.fdv_usd)
+  BigInt(Number(response.data.data.attributes.fdv_usd).toFixed(0))
 )}`;
 
 {
