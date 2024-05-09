@@ -79,7 +79,9 @@ export const pendingSettings = async () => {
           delete buySettingsState[username];
         } else if (buySettingsState[username].type == "editSlippage") {
           await setSlippage(username, Number(text));
-          await ctx.replyWithHTML(`<i> Slippage set to ${text}%</i>`);
+          await ctx.replyWithHTML(
+            `<i> Slippage set to ${Math.ceil(Number(text))}%</i>`
+          );
           delete buySettingsState[username];
         } else if (buySettingsState[username].type == "editBuyAmount") {
           await editBuyAmount(username, Number(text));

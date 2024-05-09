@@ -63,7 +63,8 @@ export const buy = async (ctx) => {
         response.attributes.decimals,
         response.attributes.symbol,
         response.attributes.name,
-        amountToBuy
+        amountToBuy,
+        currentUser.slippage ? currentUser.slippage : ""
       );
       await ctx.replyWithHTML(
         `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer  ${result.hash} </a>`

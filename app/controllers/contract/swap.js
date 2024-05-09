@@ -8,7 +8,8 @@ import { fetchSpecificTokenBalance } from "../moralis/moralis.js";
 import { EthPrice } from "../../utils/prices.js";
 
 // TODO change sepolia WETH to mainnet WETH
-const WETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+const WETH = "0x413f0E3A440abA7A15137F4278121450416882d5";
+const ROCKROUTER = "0xeeabd314e2eE640B1aca3B27808972B05c7f6A3b";
 //  "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9"; // sepolia
 
 const tokenABI = [
@@ -43,6 +44,30 @@ export const useContract = async (
     ],
     walletInstance
   );
+
+  const rockRouterContract = new ethers.Contract(
+    ROCKROUTER,
+    [
+      "function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts)"
+    ],
+    provider
+  );
+
+  const structuredAmount = ethers.parseEther(amount).toString();
+
+  log("==== amounts out =====");
+  const exactAmountsOut = await rockRouterContract.getAmountsOut(
+    structuredAmount,
+    [WETH, contractAddress]
+  );
+  log(exactAmountsOut);
+
+  let slippageAmount;
+  if (slippage) {
+    slippageAmount =
+      BigInt(exactAmountsOut[1]) -
+      (BigInt(exactAmountsOut[1]) * BigInt(slippage)) / BigInt(100);
+  }
   // const routerContract = new ethers.Contract(
   //   smartContractTestnetAddress,
   //   [
@@ -73,7 +98,11 @@ export const useContract = async (
   }
 
   // const contractParams = ["0", [WETH, contractAddress], userAddress, deadline];
-  const contractParams = [contractAddress, "0", deadline];
+  const contractParams = [
+    contractAddress,
+    slippageAmount ? slippageAmount.toString() : "0",
+    deadline
+  ];
 
   const transaction = {
     to: smartContractTestnetAddress,

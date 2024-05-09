@@ -188,7 +188,7 @@ export const setMaxBuyTax = async (telegramId, amount) => {
 export const setSlippage = async (telegramId, amount) => {
   return await User.findOneAndUpdate(
     { username: telegramId },
-    { slippage: Number(amount) }
+    { slippage: Math.ceil(Number(amount)) }
   );
 };
 
