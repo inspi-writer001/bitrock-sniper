@@ -44,6 +44,16 @@ export const eeditMaxBuyTax = async (ctx) => {
   await ctx.replyWithHTML(`<code>Enter Maximum Buy Tax: 5 == 5% Tax</code>`);
 };
 
+export const eeditSlippage = async (ctx) => {
+  let username = ctx.from.id.toString();
+  buySettingsState[username] = {
+    type: "editSlippage"
+  };
+  await ctx.replyWithHTML(
+    `<code>Enter Slippage Value 10 == 5% Slippage. 🙂Be generous with Slippage, most tx won't be processed if your slipage is slim</code>`
+  );
+};
+
 //  sell eedits
 export const eeditMaxSellTax = async (ctx) => {
   let username = ctx.from.id.toString();

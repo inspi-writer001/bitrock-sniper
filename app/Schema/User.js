@@ -76,6 +76,10 @@ let userSchema = new mongoose.Schema({
   wallets: {
     type: [],
     default: []
+  },
+  slippage: {
+    type: Number,
+    default: 10
   }
 });
 

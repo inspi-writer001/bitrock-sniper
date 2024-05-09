@@ -45,7 +45,8 @@ import {
   eeditSellHiAmount,
   eeditSellHix,
   eeditSellLoAmount,
-  eeditSellLox
+  eeditSellLox,
+  eeditSlippage
 } from "./robot/eedits.js";
 
 import { buy } from "./robot/buy.js";
@@ -140,12 +141,13 @@ bot.action("editMaxLiquidity", eeditMaxLiquidity);
 bot.action("editMaxBuyTax", eeditMaxBuyTax);
 bot.action("editMaxSellTax", eeditMaxSellTax);
 bot.action("editSellHix", eeditSellHix);
+bot.action("editSlippage", eeditSlippage);
 bot.action("editSellLox", eeditSellLox);
 bot.action("editSellHiAmount", eeditSellHiAmount);
 bot.action("editSellLoAmount", eeditSellLoAmount);
 bot.action("editBuyAmount", eeditBuyAmount);
 bot.action(["buyXAmount", "buyPercentage"], doSwitchBuyType);
-bot.action(["0.05", "0.1", "buy_custom"], buy);
+bot.action(["100", "500", "1000", "1500", "buy_custom"], buy);
 bot.action("sell", sellMenu);
 bot.action(
   ["10p", "20p", "30p", "50p", "70p", "90p", "100p", "sell_custom"],

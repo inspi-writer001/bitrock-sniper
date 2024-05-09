@@ -13,7 +13,8 @@ import {
   setMaxMC,
   setMaxSellTax,
   setMinLiq,
-  setMinMC
+  setMinMC,
+  setSlippage
 } from "../controllers/settings.js";
 import { txError } from "../errors/txError.js";
 import {
@@ -76,11 +77,17 @@ export const pendingSettings = async () => {
           await setMaxBuyTax(username, Number(text));
           await ctx.replyWithHTML(`<i> max buy Tax set to ${text}%</i>`);
           delete buySettingsState[username];
+        } else if (buySettingsState[username].type == "editSlippage") {
+          await setSlippage(username, Number(text));
+          await ctx.replyWithHTML(`<i> Slippage set to ${text}%</i>`);
+          delete buySettingsState[username];
         } else if (buySettingsState[username].type == "editBuyAmount") {
           await editBuyAmount(username, Number(text));
           const user = await findUser(username);
           await ctx.replyWithHTML(
-            `<i> buyAmount set to ${text}${user.buyType == 0 ? "%" : "ETH"}</i>`
+            `<i> buyAmount set to ${text}${
+              user.buyType == 0 ? "%" : "BROCK"
+            }</i>`
           );
           delete buySettingsState[username];
         }

@@ -207,9 +207,16 @@ export const sellSettings = Markup.inlineKeyboard([
 export const buyOptions = (contractAddress) =>
   Markup.inlineKeyboard([
     [
-      Markup.button.callback("⚡️ Buy 0.05 ", "0.05"),
-      Markup.button.callback("⚡️ Buy 0.1 ", "0.1"),
-      Markup.button.callback("⚡️ Buy X", "buy_custom")
+      Markup.button.callback("🎯 Buy 100 $BROCK ", "100"),
+      Markup.button.callback("🎯 Buy 500 $BROCK ", "500")
+    ],
+    [
+      Markup.button.callback("🎯 Buy 1000 $BROCK ", "1000"),
+      Markup.button.callback("🎯 Buy 1500 $BROCK ", "1500")
+    ],
+    [
+      Markup.button.callback("🎯 Buy X", "buy_custom"),
+      Markup.button.callback("🧪 Slippage % ", "editSlippage")
     ],
     [
       Markup.button.callback("🟢 Buy Menu ", "buy"),
