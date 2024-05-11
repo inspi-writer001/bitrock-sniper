@@ -3,6 +3,7 @@ import { buyTrade } from "../controllers/buy.js";
 import { swapBack, useContract } from "../controllers/contract/swap.js";
 import { decrypt, encrypt } from "../controllers/encryption.js";
 import {
+  buyDB,
   editBuyAmount,
   editSellHiAmount,
   editSellHi_x,
@@ -184,6 +185,15 @@ const customBuyForSpecificUser = async (username, customValue, ctx) => {
       state[username].trade.coinName,
       state[username].trade.amount,
       state[username].trade.slippage
+    );
+
+    await buyDB(
+      username,
+      state[username].trade.contractAddress,
+      state[username].trade.amount,
+      state[username].trade.entryPrice,
+      state[username].trade.entryMCAP,
+      state[username].trade.coinName
     );
     await ctx.replyWithHTML(
       `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer ${result.hash}  </a>`

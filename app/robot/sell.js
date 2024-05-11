@@ -13,6 +13,8 @@ import { txError } from "../errors/txError.js";
 import { swapBack, useContract } from "../controllers/contract/swap.js";
 import { fastKeyboard } from "../utils/keyboards.js";
 import { customSellForSpecificUser } from "./editSettings.js";
+import { generateImage } from "../utils/generateImage.js";
+import { tokenInfo } from "../utils/prices.js";
 
 export const sell = async (ctx) => {
   try {
@@ -100,6 +102,30 @@ export const sell = async (ctx) => {
       (await customSellForSpecificUser(currentUser, customValue, ctx));
   } catch (error) {
     log(" error from custom sell ============");
+    err(error);
+  }
+};
+
+export const sendPnl = async (ctx) => {
+  try {
+    let username = ctx.from.id.toString();
+
+    const userStateTrade = sellState[username].trade.contractAddress;
+
+    const currentUser = await findUser(username);
+    const userTrade = currentUser.trades[userStateTrade.toLowerCase()];
+
+    const tokenI = await tokenInfo(userStateTrade);
+    const imageUrl = await generateImage(
+      userTrade.coinName,
+      "| SELL",
+      userTrade.entryPrice,
+      tokenI.attributes.price_usd
+    );
+
+    await ctx.replyWithPhoto(imageUrl.data.download_url_png);
+  } catch (error) {
+    log(" error from sendPnl ============");
     err(error);
   }
 };

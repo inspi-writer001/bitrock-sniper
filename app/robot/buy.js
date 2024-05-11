@@ -4,6 +4,7 @@ import { buyAddress, state, usersAwaitingAmount } from "../index.js";
 import { err, log } from "../utils/globals.js";
 import { txError } from "../errors/txError.js";
 import { useContract } from "../controllers/contract/swap.js";
+import { buyDB } from "../controllers/settings.js";
 
 export const buy = async (ctx) => {
   try {
@@ -34,7 +35,9 @@ export const buy = async (ctx) => {
           encrypted_mnemonics: userEncryptedMnemonics,
           decimals: response.attributes.decimals,
           ticker: response.attributes.symbol,
-          coinName: response.attributes.name
+          coinName: response.attributes.name,
+          entryPrice: response.attributes["price_usd"],
+          entryMCAP: response.attributes["fdv_usd"]
         }
       };
       log("user value is different");
@@ -65,6 +68,15 @@ export const buy = async (ctx) => {
         response.attributes.name,
         amountToBuy,
         currentUser.slippage ? currentUser.slippage : ""
+      );
+
+      await buyDB(
+        user,
+        response.attributes.address.toLowerCase(),
+        amountToBuy,
+        response.attributes["price_usd"],
+        response.attributes["fdv_usd"],
+        response.attributes.name
       );
       await ctx.replyWithHTML(
         `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer  ${result.hash} </a>`

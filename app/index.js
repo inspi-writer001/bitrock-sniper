@@ -51,12 +51,13 @@ import {
 
 import { buy } from "./robot/buy.js";
 import { log } from "./utils/globals.js";
-import { sell } from "./robot/sell.js";
+import { sell, sendPnl } from "./robot/sell.js";
 // import { snipe } from "./controllers/trade.js";
 import express from "express";
 import { preSnipeAction } from "./controllers/preTrade.js";
 import { openSnipes } from "./utils/keyboards.js";
 import { exportWallet } from "./controllers/wallet/createWallet.js";
+import { generateImage } from "./utils/generateImage.js";
 
 dotenv.config();
 const MONGO_URI = process.env.MONGO_URI;
@@ -148,6 +149,7 @@ bot.action("editSellLoAmount", eeditSellLoAmount);
 bot.action("editBuyAmount", eeditBuyAmount);
 bot.action(["buyXAmount", "buyPercentage"], doSwitchBuyType);
 bot.action(["100", "500", "1000", "1500", "buy_custom"], buy);
+bot.action("pnl", sendPnl);
 bot.action("sell", sellMenu);
 bot.action(
   ["10p", "20p", "30p", "50p", "70p", "90p", "100p", "sell_custom"],

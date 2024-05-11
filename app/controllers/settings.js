@@ -1,3 +1,4 @@
+import { message } from "telegraf/filters";
 import User from "../Schema/User.js";
 
 // trigger snipe
@@ -229,6 +230,31 @@ export const defaullWallet = async (telegramId) => {
     username: telegramId
   });
   return user.defaultAddress;
+};
+
+export const buyDB = async (
+  telegramId,
+  contractAddress,
+  amount,
+  entryPrice,
+  entryMCAP,
+  tokenName
+) => {
+  const user = await User.findOne({ username: telegramId });
+  if (user) {
+    user.trades[contractAddress.toLowerCase()] = {
+      entryPrice,
+      entryMCAP,
+      amount,
+      tokenName
+    };
+
+    await user.save();
+    return {
+      message: "okay",
+      response: "address updated"
+    };
+  } else return;
 };
 
 // setTimeout(async () => {
