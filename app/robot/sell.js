@@ -2,6 +2,7 @@ import { decrypt, encrypt } from "../controllers/encryption.js";
 import { findUser } from "../database/users.js";
 import {
   buyAddress,
+  pnlState,
   sellAddress,
   sellState,
   state,
@@ -109,23 +110,41 @@ export const sell = async (ctx) => {
 export const sendPnl = async (ctx) => {
   try {
     let username = ctx.from.id.toString();
+    log(" === pnlStae for testing ===");
+    log(pnlState);
 
-    const userStateTrade = sellState[username].trade.contractAddress;
+    const userStateTrade = pnlState[username].trade.contractAddress;
 
     const currentUser = await findUser(username);
     const userTrade = currentUser.trades[userStateTrade.toLowerCase()];
 
+    log("user current user trade ======");
+    log(currentUser);
+
+    log("user state trade ======");
+    log(userTrade);
+
     const tokenI = await tokenInfo(userStateTrade);
     const imageUrl = await generateImage(
-      userTrade.coinName,
+      `${truncateText(userTrade.tokenName)} / BROCK`,
       "| SELL",
       userTrade.entryPrice,
       tokenI.attributes.price_usd
     );
-
+    await ctx.reply(" 🌠 Loading PNL ...... ");
     await ctx.replyWithPhoto(imageUrl.data.download_url_png);
   } catch (error) {
     log(" error from sendPnl ============");
     err(error);
+    await ctx.reply(" 😵‍💫 Can't Find PNL for that trade ...... ");
+  }
+};
+
+const truncateText = (text) => {
+  const maxLength = 6;
+  if (text.length > maxLength) {
+    return text.substring(0, maxLength) + "...";
+  } else {
+    return text;
   }
 };

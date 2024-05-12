@@ -77,6 +77,7 @@ app.listen(process.env.PORT || 14818, () => {
 
 const lastRequestTimes = {};
 export const state = {};
+export const pnlState = {};
 export const buySettingsState = {};
 export const sellSettingsState = {};
 export const sellState = {};

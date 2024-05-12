@@ -2,7 +2,7 @@ import axios from "axios";
 import dotenv from "dotenv";
 import { err, log } from "../utils/globals.js";
 import { buyMessage, buyOptions, sellOptions } from "../utils/keyboards.js";
-import { buyAddress, sellAddress } from "../index.js";
+import { buyAddress, pnlState, sellAddress } from "../index.js";
 import { findUser } from "../database/users.js";
 import { fetchSpecificTokenBalance } from "./moralis/moralis.js";
 import { fromCustomLamport } from "../utils/converters.js";
@@ -71,7 +71,19 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
 
         // keyboard
         sell == true
-          ? await ctx.replyWithHTML(message, sellOption)
+          ? (async () => {
+              await ctx.replyWithHTML(message, sellOption);
+              pnlState[username] = {
+                state: "pnl",
+                trade: {
+                  userAddress: userAddress,
+                  contractAddress: response.data.data.attributes.address,
+                  decimals: response.data.data.attributes.decimals,
+                  ticker: response.data.data.attributes.symbol,
+                  tokenName: response.data.data.attributes.name
+                }
+              };
+            })()
           : await ctx.replyWithHTML(message, option);
         sell == true
           ? (sellAddress[username] = response.data.data)

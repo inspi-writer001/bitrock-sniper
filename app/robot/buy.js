@@ -40,6 +40,7 @@ export const buy = async (ctx) => {
           entryMCAP: response.attributes["fdv_usd"]
         }
       };
+
       log("user value is different");
       log("User wants a custom value for buy");
       // awaitingCustomValue = true;
