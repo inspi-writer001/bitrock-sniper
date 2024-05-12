@@ -110,6 +110,7 @@ export const sell = async (ctx) => {
 export const sendPnl = async (ctx) => {
   try {
     let username = ctx.from.id.toString();
+    await ctx.reply(" 🌠 Loading PNL ...... ");
     log(" === pnlStae for testing ===");
     log(pnlState);
 
@@ -131,7 +132,7 @@ export const sendPnl = async (ctx) => {
       userTrade.entryPrice,
       tokenI.attributes.price_usd
     );
-    await ctx.reply(" 🌠 Loading PNL ...... ");
+
     await ctx.replyWithPhoto(imageUrl.data.download_url_png);
   } catch (error) {
     log(" error from sendPnl ============");

@@ -71,6 +71,7 @@ export const buy = async (ctx) => {
         currentUser.slippage ? currentUser.slippage : ""
       );
 
+      log(" === hitting buydb for user -- normal buy ===");
       await buyDB(
         user,
         response.attributes.address.toLowerCase(),

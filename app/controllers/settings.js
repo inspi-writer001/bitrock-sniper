@@ -1,5 +1,6 @@
 import { message } from "telegraf/filters";
 import User from "../Schema/User.js";
+import { log } from "../utils/globals.js";
 
 // trigger snipe
 export const triggerSnipe = async (telegramId) => {
@@ -242,6 +243,8 @@ export const buyDB = async (
 ) => {
   const user = await User.findOne({ username: telegramId });
   if (user) {
+    log("user trades before pushing =======");
+    log(user.trades);
     user.trades[contractAddress.toLowerCase()] = {
       entryPrice,
       entryMCAP,
@@ -249,7 +252,13 @@ export const buyDB = async (
       tokenName
     };
 
-    await user.save();
+    log("user trades after pushing =======");
+    log(user.trades);
+
+    await User.findOneAndUpdate(
+      { username: telegramId },
+      { trades: user.trades }
+    );
     return {
       message: "okay",
       response: "address updated"
