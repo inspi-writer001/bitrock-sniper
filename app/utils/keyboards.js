@@ -250,10 +250,10 @@ export const sellOptions = (contractAddress) =>
     ],
     [
       Markup.button.callback("⏪ Open Trades ", "sell"),
-      Markup.button.callback("🏠 Main Menu ", "mainMenu")
+      Markup.button.callback("🏠 Main Menu ", "mainMenu"),
+      Markup.button.callback("🖼️ Share PNL ", "pnl")
     ],
     [
-      Markup.button.callback("🖼️ Share PNL ", "pnl"),
       Markup.button.url(
         "📊 Chart ",
         `https://www.geckoterminal.com/bitrock/pools/${contractAddress}`
