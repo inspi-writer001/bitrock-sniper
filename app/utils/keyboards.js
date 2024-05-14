@@ -222,7 +222,7 @@ export const buyOptions = (
         "nothing"
       )
     ],
-    [Markup.button.callback(`--- Your Actions ---`, "nothing")],
+    [Markup.button.callback(` --- Your Actions --- `, "nothing")],
     [
       Markup.button.callback("🎯 Buy 100 $BROCK ", "100"),
       Markup.button.callback("🎯 Buy 500 $BROCK ", "500")
@@ -275,7 +275,7 @@ export const sellOptions = (
         "nothing"
       )
     ],
-    [Markup.button.callback(`--- Your Actions ---`, "nothing")],
+    [Markup.button.callback(` --- Your Actions --- `, "nothing")],
     [
       Markup.button.callback("⚡️ Sell 10% ", "10p"),
       Markup.button.callback("⚡️ Sell 20% ", "20p"),
@@ -335,7 +335,7 @@ export const buyMessage = (response, body, poolData) => `
   response.data.data.relationships.top_pools.data[0].id.split("bitrock_")[1]
 }</code>\nCA: <code>${
   response.data.data.attributes.address
-}</code>\nV2</b> Pool\n\n
+}</code> V2</b> Pool\n\n
 <b>🔺 Price</b>                 | $${response.data.data.attributes.price_usd}
 <b>🗄 Total Supply</b>  | ${formatNumber(
   fromCustomLamport(
@@ -373,6 +373,10 @@ export const buyMessage = (response, body, poolData) => `
 {
   /* <b>📉 CA Balance</b>    | 0.17% */
 }
+
+//<b>⚖️ Taxes</b>         | Ⓑ ${body.honeyPot.simulationResult.buyTax || 0}% ⓢ ${
+// body.honeyPot.simulationResult.sellTax || 0
+//}%
 
 export const openSnipes = async (ctx) => {
   let username = ctx.from.id.toString();

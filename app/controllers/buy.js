@@ -9,6 +9,7 @@ import { fromCustomLamport } from "../utils/converters.js";
 import { getAverageGasLimit } from "./ethers/blockDetails.js";
 import { fetchETH } from "./fetchBalance.js";
 import { EthPrice } from "../utils/prices.js";
+import { fetchHoneypot } from "./fetchHoneypot.js";
 
 dotenv.config();
 const env = process.env;
@@ -66,10 +67,18 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
         );
         const poolData = pool.data.data;
 
+        // const honeyPot = fetchHoneypot(
+        //   contractAddress,
+        //   response.data.data.relationships.top_pools.data[0].id.split(
+        //     "bitrock_"
+        //   )[1]
+        // );
+
         //   log(response);
         const body = {
           balance: Number(formattedBalance).toFixed(3) || 0
         };
+
         const message = buyMessage(response, body, poolData);
         const option = buyOptions(
           contractAddress,
