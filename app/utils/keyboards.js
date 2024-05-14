@@ -204,8 +204,25 @@ export const sellSettings = Markup.inlineKeyboard([
 //   [Markup.button.callback(" Advanced Mode ➡ ", "autoBuy")],
 // ]
 
-export const buyOptions = (contractAddress) =>
+export const buyOptions = (
+  contractAddress,
+  walletIndex,
+  walletAddress,
+  balanceBrock,
+  balanceUSD,
+  slippage
+) =>
   Markup.inlineKeyboard([
+    [
+      Markup.button.callback(
+        `Wallet ${walletIndex + 1} - ${truncateText(
+          walletAddress,
+          4
+        )} ✅ - Balance ${balanceBrock} $BROCK - ${balanceUSD}$`,
+        "nothing"
+      )
+    ],
+    [Markup.button.callback(`--- Your Actions ---`, "nothing")],
     [
       Markup.button.callback("🎯 Buy 100 $BROCK ", "100"),
       Markup.button.callback("🎯 Buy 500 $BROCK ", "500")
@@ -216,7 +233,7 @@ export const buyOptions = (contractAddress) =>
     ],
     [
       Markup.button.callback("🎯 Buy X", "buy_custom"),
-      Markup.button.callback("🧪 Slippage % ", "editSlippage")
+      Markup.button.callback(`🧪 Slippage % (${slippage}) `, "editSlippage")
     ],
     [
       Markup.button.callback("🟢 Buy Menu ", "buy"),
@@ -232,8 +249,33 @@ export const buyOptions = (contractAddress) =>
     ]
   ]);
 
-export const sellOptions = (contractAddress) =>
+export const truncateText = (text, length) => {
+  const maxLength = length || 6;
+  if (text.length > maxLength) {
+    return text.substring(0, maxLength) + "...";
+  } else {
+    return text;
+  }
+};
+
+export const sellOptions = (
+  contractAddress,
+  walletIndex,
+  walletAddress,
+  balanceBrock,
+  balanceUSD
+) =>
   Markup.inlineKeyboard([
+    [
+      Markup.button.callback(
+        `Wallet ${walletIndex + 1} - ${truncateText(
+          walletAddress,
+          4
+        )} ✅ - Balance ${balanceBrock} $BROCK - ${balanceUSD}$`,
+        "nothing"
+      )
+    ],
+    [Markup.button.callback(`--- Your Actions ---`, "nothing")],
     [
       Markup.button.callback("⚡️ Sell 10% ", "10p"),
       Markup.button.callback("⚡️ Sell 20% ", "20p"),

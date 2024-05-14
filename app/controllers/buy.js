@@ -7,6 +7,8 @@ import { findUser } from "../database/users.js";
 import { fetchSpecificTokenBalance } from "./moralis/moralis.js";
 import { fromCustomLamport } from "../utils/converters.js";
 import { getAverageGasLimit } from "./ethers/blockDetails.js";
+import { fetchETH } from "./fetchBalance.js";
+import { EthPrice } from "../utils/prices.js";
 
 dotenv.config();
 const env = process.env;
@@ -34,6 +36,9 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
       tokenBalance[0]?.balance || 0,
       tokenBalance[0]?.decimals || 0
     );
+
+    const userBalance = await fetchETH(userAddress);
+    const balanceWorth = await EthPrice(userBalance);
 
     log(formattedBalance);
     await axios
@@ -66,8 +71,21 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
           balance: Number(formattedBalance).toFixed(3) || 0
         };
         const message = buyMessage(response, body, poolData);
-        const option = buyOptions(contractAddress);
-        const sellOption = sellOptions(contractAddress);
+        const option = buyOptions(
+          contractAddress,
+          user.defaultAddress,
+          user.walletAddress,
+          userBalance,
+          balanceWorth,
+          user.slippage ? user.slippage : "default"
+        );
+        const sellOption = sellOptions(
+          contractAddress,
+          user.defaultAddress,
+          user.walletAddress,
+          userBalance,
+          balanceWorth
+        );
 
         // keyboard
         sell == true

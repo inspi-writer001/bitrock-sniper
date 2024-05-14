@@ -141,8 +141,8 @@ export const sendPnl = async (ctx) => {
   }
 };
 
-const truncateText = (text) => {
-  const maxLength = 6;
+export const truncateText = (text, length) => {
+  const maxLength = length || 6;
   if (text.length > maxLength) {
     return text.substring(0, maxLength) + "...";
   } else {
