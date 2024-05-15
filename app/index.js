@@ -90,10 +90,18 @@ export const selectPreSnipes = {};
 export const preSnipe = [];
 
 export const bot = new Telegraf(process.env.TELEGRAM_API);
-bot.use((ctx, next) => {
+bot.use(async (ctx, next) => {
   const userId = ctx.from.id;
   // Check if the user has made a recent request
   log(ctx?.message?.text);
+  // const message = await ctx.reply(
+  //   `🔘 Submitting Transaction || Wallet $`
+  // );
+
+  // message.chat.id
+
+  // ctx.deleteMessage()
+
   if (
     lastRequestTimes[userId] &&
     Date.now() - lastRequestTimes[userId] < 1000

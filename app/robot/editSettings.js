@@ -170,8 +170,15 @@ const customBuyForSpecificUser = async (username, customValue, ctx) => {
 
   log("running custom buy ============");
 
-  await ctx.reply("processing tx ⚡️ ==========");
-  await ctx.reply("processing gas ⛽️ ==========");
+  // await ctx.reply("processing tx ⚡️ ==========");
+  // await ctx.reply("processing gas ⛽️ ==========");
+
+  const currentUser = await findUser(username);
+  const message = await ctx.reply(
+    `🔘 Submitting Transaction || Wallet ${currentUser.defaultAddress + 1} ${
+      currentUser.walletAddress
+    }`
+  );
 
   // TODO remove test contract address
 
@@ -195,9 +202,24 @@ const customBuyForSpecificUser = async (username, customValue, ctx) => {
       state[username].trade.entryMCAP,
       state[username].trade.coinName
     );
+
+    await ctx.deleteMessage(message.message_id);
+
     await ctx.replyWithHTML(
-      `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer ${result.hash}  </a>`
+      `<b>📝 Transaction Approved || You bought </b> <a href="https://explorer.bit-rock.io/tx/${
+        result.hash
+      }">${Number(result.amountOut).toFixed(2)} $${
+        state[username].trade.coinName
+      } for ${state[username].trade.amount} $BROCK</a> || 💳 Wallet ${
+        currentUser.defaultAddress + 1
+      } <a href="https://explorer.bit-rock.io/address/${
+        currentUser.walletAddress
+      }">${currentUser.walletAddress}</a>`
     );
+
+    // await ctx.replyWithHTML(
+    //   `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer ${result.hash}  </a>`
+    // );
     // await ctx.replyWithHTML(
     //   `<b> fetching your portfolio details ♻️ ===== </b>`
     // );
@@ -395,3 +417,12 @@ export const sellCallBackQuery = async (ctx) => {
 };
 
 // / to trigger build
+
+const truncateText = (text, length) => {
+  const maxLength = length || 6;
+  if (text.length > maxLength) {
+    return text.substring(0, maxLength) + "...";
+  } else {
+    return text;
+  }
+};

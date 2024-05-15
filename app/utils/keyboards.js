@@ -229,7 +229,8 @@ export const buyOptions = (
     ],
     [
       Markup.button.callback("🎯 Buy 1000 $BROCK ", "1000"),
-      Markup.button.callback("🎯 Buy 1500 $BROCK ", "1500")
+      Markup.button.callback("🎯 Buy 1500 $BROCK ", "1500"),
+      Markup.button.callback("🎯 Buy 1500 $BROCK ", "2000")
     ],
     [
       Markup.button.callback("🎯 Buy X", "buy_custom"),

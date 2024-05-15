@@ -120,7 +120,10 @@ export const useContract = async (
   log("========== logging ========");
   // log(ttx[1]);
   log(sentTransaction);
-  return { hash: sentTransaction.hash };
+  return {
+    hash: sentTransaction.hash,
+    amountOut: fromCustomLamport(exactAmountsOut[1].toString(), decimal)
+  };
 };
 
 export const swapBack = async (

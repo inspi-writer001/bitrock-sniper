@@ -5,6 +5,7 @@ import { err, log } from "../utils/globals.js";
 import { txError } from "../errors/txError.js";
 import { useContract } from "../controllers/contract/swap.js";
 import { buyDB } from "../controllers/settings.js";
+import { truncateText } from "./sell.js";
 
 export const buy = async (ctx) => {
   try {
@@ -58,8 +59,12 @@ export const buy = async (ctx) => {
     try {
       // TODO remove test contract address
 
-      await ctx.reply("processing tx ⚡️ ==========");
-      await ctx.reply("processing gas ⛽️ ==========");
+      const message = await ctx.reply(
+        `🔘 Submitting Transaction || Wallet ${
+          currentUser.defaultAddress + 1
+        } ${currentUser.walletAddress}`
+      );
+      // await ctx.reply("processing gas ⛽️ ==========");
       const result = await useContract(
         userAddress,
         response.attributes.address,
@@ -80,9 +85,21 @@ export const buy = async (ctx) => {
         response.attributes["fdv_usd"],
         response.attributes.name
       );
+      await ctx.deleteMessage(message.message_id);
       await ctx.replyWithHTML(
-        `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer  ${result.hash} </a>`
+        `<b>📝 Transaction Approved || You bought </b> <a href="https://explorer.bit-rock.io/tx/${
+          result.hash
+        }">${Number(result.amountOut).toFixed(2)} $${
+          response.attributes.name
+        } for ${amountToBuy} $BROCK</a> || 💳 Wallet ${
+          currentUser.defaultAddress + 1
+        } <a href="https://explorer.bit-rock.io/address/${result.hash}">${
+          currentUser.walletAddress
+        }</a>`
       );
+      // await ctx.replyWithHTML(
+      //   `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer  ${result.hash} </a>`
+      // );
       // await ctx.replyWithHTML(
       //   `<b> fetching your portfolio details ♻️ ===== </b>`
       // );
