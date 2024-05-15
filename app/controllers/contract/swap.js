@@ -191,8 +191,8 @@ export const swapBack = async (
   // );
 
   try {
-    log(" =========== trying approve ===========");
-    await ctx.reply(" === approving swap 💌 === ");
+    // log(" =========== trying approve ===========");
+    // await ctx.reply(" === approving swap 💌 === ");
     await approve(
       privateKey,
       contractAddress,
@@ -211,7 +211,7 @@ export const swapBack = async (
   }
   const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // Set a deadline (10 minutes from now)
 
-  await ctx.reply(" === we're still on it 💌 === ");
+  // await ctx.reply(" === we're still on it 💌 === ");
 
   // log("------ table -----");
   // log(

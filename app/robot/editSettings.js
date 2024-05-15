@@ -244,9 +244,15 @@ export const customSellForSpecificUser = async (username, customValue, ctx) => {
   log(sellState[username]);
 
   log("running custom sell ==========");
+  const currentUser = await findUser(username);
+  const message = await ctx.reply(
+    `🔘 Submitting Transaction || Wallet ${currentUser.defaultAddress + 1} ${
+      currentUser.walletAddress
+    }`
+  );
 
-  await ctx.reply("========== processing tx ⚡️");
-  await ctx.reply("========== processing gas ⛽️");
+  // await ctx.reply("========== processing tx ⚡️");
+  // await ctx.reply("========== processing gas ⛽️");
 
   // TODO remove test contractAddress
 
@@ -263,6 +269,8 @@ export const customSellForSpecificUser = async (username, customValue, ctx) => {
       false,
       ctx
     );
+
+    await ctx.deleteMessage(message.message_id);
     await ctx.replyWithHTML(
       `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer ${result.hash}  </a>`,
       fastKeyboard
