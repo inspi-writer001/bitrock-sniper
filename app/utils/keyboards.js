@@ -356,8 +356,7 @@ export const buyMessage = (response, body, poolData) =>
     BigInt(Number(response.data.data.attributes.fdv_usd).toFixed(0))
   )}
 
-<span class="tg-spoiler">💬 If you want to stay updated 24/7, join our Telegram for more info at  || @Bitrockelitebotsupport 💬</span>\n\n` +
-  `<span class="tg-spoiler"> 🍌 Enjoy your Benefits as a $APE Holder and Sniper DAO Member! </span>`;
+<span class="tg-spoiler">💬 If you want to stay updated 24/7, join our Telegram for more info at  || @Bitrockelitebotsupport 💬</span>\n\n`;
 
 {
   /* <a href='https://app.uniswap.org/tokens/ethereum/${
