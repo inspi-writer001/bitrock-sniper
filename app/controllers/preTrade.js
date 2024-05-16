@@ -37,7 +37,7 @@ const pairAbi = [
 ];
 
 // TODO change WETH address from sepolia to mainnet
-const WETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+const WETH = "0x413f0E3A440abA7A15137F4278121450416882d5";
 // const WETH = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9"; // testnet
 // const uniswapV2FactorySepoliaIsh = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
 const factoryContract = factoeryMainnet;
@@ -50,7 +50,7 @@ const routerContract = smartContractTestnetAddress; // mainnet router
 export const preSnipeAction = async (bot) => {
   try {
     // const provider = new ethers.WebSocketProvider(globals.infuraSepoliaWss);
-    const provider = new ethers.WebSocketProvider(globals.infuraMainnetWss); // testnet
+    const provider = new ethers.JsonRpcProvider(globals.infuraSepolia); // testnet
 
     const factory = new ethers.Contract(factoryContract, factoryAbi, provider);
 
