@@ -229,8 +229,7 @@ export const buyOptions = (
     ],
     [
       Markup.button.callback("🎯 Buy 1000 $BROCK ", "1000"),
-      Markup.button.callback("🎯 Buy 1500 $BROCK ", "1500"),
-      Markup.button.callback("🎯 Buy 1500 $BROCK ", "2000")
+      Markup.button.callback("🎯 Buy 1500 $BROCK ", "1500")
     ],
     [
       Markup.button.callback("🎯 Buy X", "buy_custom"),
@@ -329,32 +328,36 @@ export const formatNormalNumber = (number) => {
   return millify(Number(number));
 };
 
-export const buyMessage = (response, body, poolData) => `
+export const buyMessage = (response, body, poolData) =>
+  `
 <b>🌕 ${response.data.data.attributes.name} ($${
-  response.data.data.attributes.symbol
-}) 🔗 BITROCK Token</b>\n<b>LP: <code>${
-  response.data.data.relationships.top_pools.data[0].id.split("bitrock_")[1]
-}</code>\nCA: <code>${
-  response.data.data.attributes.address
-}</code> V2</b> Pool\n\n
+    response.data.data.attributes.symbol
+  }) 🔗 BITROCK Token</b>\n<b>LP: <code>${
+    response.data.data.relationships.top_pools.data[0].id.split("bitrock_")[1]
+  }</code>\nCA: <code>${
+    response.data.data.attributes.address
+  }</code> V2</b> Pool\n\n
 <b>🔺 Price</b>                 | $${response.data.data.attributes.price_usd}
 <b>🗄 Total Supply</b>  | ${formatNumber(
-  fromCustomLamport(
-    response.data.data.attributes.total_supply,
-    response.data.data.attributes.decimals
-  ).toFixed(0)
-)} ${response.data.data.attributes.symbol}
+    fromCustomLamport(
+      response.data.data.attributes.total_supply,
+      response.data.data.attributes.decimals
+    ).toFixed(0)
+  )} ${response.data.data.attributes.symbol}
 <b>💰 Balance</b>           | ${body.balance}
 <b>💧 Liquidity</b>         | $${poolData.attributes["reserve_in_usd"]}
 <b>💪 MC/Liq</b>             | ${formatNormalNumber(
-  (
-    Number(response.data.data.attributes.fdv_usd) /
-    Number(poolData.attributes["reserve_in_usd"])
-  ).toFixed(3)
-)}
+    (
+      Number(response.data.data.attributes.fdv_usd) /
+      Number(poolData.attributes["reserve_in_usd"])
+    ).toFixed(3)
+  )}
 <b>🧢 Market Cap</b>    | $${formatNumber(
-  BigInt(Number(response.data.data.attributes.fdv_usd).toFixed(0))
-)}`;
+    BigInt(Number(response.data.data.attributes.fdv_usd).toFixed(0))
+  )}
+
+<span class="tg-spoiler">💬 If you want to stay updated 24/7, join our Telegram for more info at  || @Bitrockelitebotsupport 💬</span>\n\n` +
+  `<span class="tg-spoiler"> 🍌 Enjoy your Benefits as a $APE Holder and Sniper DAO Member! </span>`;
 
 {
   /* <a href='https://app.uniswap.org/tokens/ethereum/${

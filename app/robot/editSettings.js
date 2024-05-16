@@ -32,7 +32,7 @@ import {
 } from "../index.js";
 import { log, err } from "../utils/globals.js";
 import { isWalletValid } from "../utils/isWalletValid.js";
-import { buyMessage } from "../utils/keyboards.js";
+import { buyMessage, fastKeyboard } from "../utils/keyboards.js";
 import { Markup } from "telegraf";
 import { findUser } from "../database/users.js";
 import { preSnipeActionDB, removeSnipeFromList } from "../database/preSnipe.js";
@@ -174,10 +174,17 @@ const customBuyForSpecificUser = async (username, customValue, ctx) => {
   // await ctx.reply("processing gas ⛽️ ==========");
 
   const currentUser = await findUser(username);
-  const message = await ctx.reply(
-    `🔘 Submitting Transaction || Wallet ${currentUser.defaultAddress + 1} ${
+  const message = await ctx.replyWithHTML(
+    `🔘 Submitting Transaction || Wallet ${
+      currentUser.defaultAddress + 1
+    } <a href="https://explorer.bit-rock.io/address/${
       currentUser.walletAddress
-    }`
+    }">${currentUser.walletAddress}</a>`,
+    {
+      link_preview_options: {
+        is_disabled: true
+      }
+    }
   );
 
   // TODO remove test contract address
@@ -214,7 +221,12 @@ const customBuyForSpecificUser = async (username, customValue, ctx) => {
         currentUser.defaultAddress + 1
       } <a href="https://explorer.bit-rock.io/address/${
         currentUser.walletAddress
-      }">${currentUser.walletAddress}</a>`
+      }">${currentUser.walletAddress}</a>`,
+      {
+        link_preview_options: {
+          is_disabled: true
+        }
+      }
     );
 
     // await ctx.replyWithHTML(
@@ -245,10 +257,17 @@ export const customSellForSpecificUser = async (username, customValue, ctx) => {
 
   log("running custom sell ==========");
   const currentUser = await findUser(username);
-  const message = await ctx.reply(
-    `🔘 Submitting Transaction || Wallet ${currentUser.defaultAddress + 1} ${
+  const message = await ctx.replyWithHTML(
+    `🔘 Submitting Transaction || Wallet ${
+      currentUser.defaultAddress + 1
+    } <a href="https://explorer.bit-rock.io/address/${
       currentUser.walletAddress
-    }`
+    }">${currentUser.walletAddress}</a>`,
+    {
+      link_preview_options: {
+        is_disabled: true
+      }
+    }
   );
 
   // await ctx.reply("========== processing tx ⚡️");
@@ -273,7 +292,11 @@ export const customSellForSpecificUser = async (username, customValue, ctx) => {
     await ctx.deleteMessage(message.message_id);
     await ctx.replyWithHTML(
       `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer ${result.hash}  </a>`,
-      fastKeyboard
+      {
+        link_preview_options: {
+          is_disabled: true
+        }
+      }
     );
     return;
   } catch (error) {

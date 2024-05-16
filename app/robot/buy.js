@@ -59,10 +59,17 @@ export const buy = async (ctx) => {
     try {
       // TODO remove test contract address
 
-      const message = await ctx.reply(
+      const message = await ctx.replyWithHTML(
         `🔘 Submitting Transaction || Wallet ${
           currentUser.defaultAddress + 1
-        } ${currentUser.walletAddress}`
+        } <a href="https://explorer.bit-rock.io/address/${
+          currentUser.walletAddress
+        }">${currentUser.walletAddress}</a>`,
+        {
+          link_preview_options: {
+            is_disabled: true
+          }
+        }
       );
       // await ctx.reply("processing gas ⛽️ ==========");
       const result = await useContract(
@@ -95,7 +102,12 @@ export const buy = async (ctx) => {
           currentUser.defaultAddress + 1
         } <a href="https://explorer.bit-rock.io/address/${result.hash}">${
           currentUser.walletAddress
-        }</a>`
+        }</a>`,
+        {
+          link_preview_options: {
+            is_disabled: true
+          }
+        }
       );
       // await ctx.replyWithHTML(
       //   `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer  ${result.hash} </a>`

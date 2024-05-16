@@ -72,8 +72,21 @@ export const sell = async (ctx) => {
     log(response);
 
     try {
-      await ctx.reply("processing tx ⚡️ ==========");
-      await ctx.reply("processing gas ⛽️ ==========");
+      // await ctx.reply("processing tx ⚡️ ==========");
+      // await ctx.reply("processing gas ⛽️ ==========");
+
+      const message = await ctx.replyWithHTML(
+        `🔘 Submitting Transaction || Wallet ${
+          currentUser.defaultAddress + 1
+        } <a href="https://explorer.bit-rock.io/address/${
+          currentUser.walletAddress
+        }">${currentUser.walletAddress}</a>`,
+        {
+          link_preview_options: {
+            is_disabled: true
+          }
+        }
+      );
       const result = await swapBack(
         userAddress,
         response.attributes.address,
@@ -87,10 +100,16 @@ export const sell = async (ctx) => {
         ctx
       );
 
+      await ctx.deleteMessage(message.message_id);
+
       // TODO change snowtrace
       await ctx.replyWithHTML(
         `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer ${result.hash}  </a>`,
-        fastKeyboard
+        {
+          link_preview_options: {
+            is_disabled: true
+          }
+        }
       );
 
       return;
