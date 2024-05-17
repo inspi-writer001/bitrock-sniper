@@ -53,7 +53,9 @@ export const useContract = async (
     provider
   );
 
-  const structuredAmount = ethers.parseEther(amount).toString();
+  const structuredAmount = ethers
+    .parseEther(((98 / 100) * Number(amount)).toFixed(2).toString())
+    .toString();
 
   log("==== amounts out =====");
   const exactAmountsOut = await rockRouterContract.getAmountsOut(
@@ -115,14 +117,19 @@ export const useContract = async (
   };
   const sentTransaction = await walletInstance.sendTransaction(transaction);
 
-  await sentTransaction.wait();
+  // await sentTransaction.wait();
 
   log("========== logging ========");
   // log(ttx[1]);
   log(sentTransaction);
   return {
     hash: sentTransaction.hash,
-    amountOut: fromCustomLamport(exactAmountsOut[1].toString(), decimal)
+    amountOut: fromCustomLamport(
+      slippageAmount
+        ? slippageAmount.toString()
+        : exactAmountsOut[1].toString(),
+      decimal
+    )
   };
 };
 
@@ -180,6 +187,24 @@ export const swapBack = async (
     ],
     walletInstance
   );
+
+  const rockRouterContract = new ethers.Contract(
+    ROCKROUTER,
+    [
+      "function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts)"
+    ],
+    provider
+  );
+
+  // const structuredAmount = ethers.parseUnits(settledBalance, ).toString();
+
+  log("==== amounts out =====");
+  const exactAmountsOut = await rockRouterContract.getAmountsOut(
+    settledBalance.toString(),
+    [contractAddress, WETH]
+  );
+  log(exactAmountsOut);
+
   // const routerContract = new ethers.Contract(
   //   smartContractTestnetAddress,
   //   [
@@ -240,7 +265,15 @@ export const swapBack = async (
   log("===== swapBack =====");
   log(swapBacks);
 
-  return { hash: swapBacks.hash };
+  return {
+    hash: swapBacks.hash,
+    amountOut: fromCustomLamport(exactAmountsOut[1].toString(), "18").toFixed(
+      2
+    ),
+    amount: Number(
+      toCustomLamport(settledBalance.toString(), decimal.toString())
+    ).toFixed(2)
+  };
 };
 
 const approve = async (

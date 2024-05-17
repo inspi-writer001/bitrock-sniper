@@ -290,14 +290,32 @@ export const customSellForSpecificUser = async (username, customValue, ctx) => {
     );
 
     await ctx.deleteMessage(message.message_id);
+
     await ctx.replyWithHTML(
-      `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer ${result.hash}  </a>`,
+      `<b>📝 Transaction Approved || You sold </b> <a href="https://explorer.bit-rock.io/tx/${
+        result.hash
+      }">${result.amount} $${response.attributes.name} for ${Number(
+        result.amountOut
+      ).toFixed(2)} $BROCK</a> || 💳 Wallet ${
+        currentUser.defaultAddress + 1
+      } <a href="https://explorer.bit-rock.io/address/${result.hash}">${
+        currentUser.walletAddress
+      }</a>`,
       {
         link_preview_options: {
           is_disabled: true
         }
       }
     );
+
+    // await ctx.replyWithHTML(
+    //   `<b>cheers 🪄🎉 here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/tx/${result.hash}"> view on explorer ${result.hash}  </a>`,
+    //   {
+    //     link_preview_options: {
+    //       is_disabled: true
+    //     }
+    //   }
+    // );
     return;
   } catch (error) {
     await txError(error, ctx);

@@ -5,7 +5,7 @@ dotenv.config();
 import axios from "axios";
 
 const env = process.env;
-const baseUrl = "https://explorer.bit-rock.io/api/v2";
+const baseUrl = "http://explorer.bit-rock.io/api/v2";
 
 // {
 //     "token_address": "0xefd6c64533602ac55ab64442307f6fe2c9307305",
