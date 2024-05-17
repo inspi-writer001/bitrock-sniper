@@ -271,7 +271,7 @@ export const swapBack = async (
       2
     ),
     amount: Number(
-      toCustomLamport(settledBalance.toString(), decimal.toString())
+      fromCustomLamport(settledBalance.toString(), decimal.toString())
     ).toFixed(2)
   };
 };
