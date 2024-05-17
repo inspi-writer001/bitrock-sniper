@@ -54,7 +54,7 @@ export const useContract = async (
   );
 
   const structuredAmount = ethers
-    .parseEther(((98 / 100) * Number(amount)).toFixed(2).toString())
+    .parseEther(((95 / 100) * Number(amount)).toFixed(2).toString())
     .toString();
 
   log("==== amounts out =====");
@@ -267,9 +267,10 @@ export const swapBack = async (
 
   return {
     hash: swapBacks.hash,
-    amountOut: fromCustomLamport(exactAmountsOut[1].toString(), "18").toFixed(
-      2
-    ),
+    amountOut: fromCustomLamport(
+      ((exactAmountsOut[1] * BigInt(94)) / BigInt(100)).toString(),
+      "18"
+    ).toFixed(2),
     amount: Number(
       fromCustomLamport(settledBalance.toString(), decimal.toString())
     ).toFixed(2)
