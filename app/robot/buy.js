@@ -94,7 +94,7 @@ export const buy = async (ctx) => {
       );
       await ctx.deleteMessage(message.message_id);
       await ctx.replyWithHTML(
-        `<b>📝 Transaction Approved || You bought </b> <a href="https://explorer.bit-rock.io/tx/${
+        `<b>📝 Transaction Approved || You bought approx. </b> <a href="https://explorer.bit-rock.io/tx/${
           result.hash
         }">${Number(result.amountOut).toFixed(2)} $${
           response.attributes.name

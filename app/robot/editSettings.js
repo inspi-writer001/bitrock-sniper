@@ -213,7 +213,7 @@ const customBuyForSpecificUser = async (username, customValue, ctx) => {
     await ctx.deleteMessage(message.message_id);
 
     await ctx.replyWithHTML(
-      `<b>📝 Transaction Approved || You bought </b> <a href="https://explorer.bit-rock.io/tx/${
+      `<b>📝 Transaction Approved || You bought approx. </b> <a href="https://explorer.bit-rock.io/tx/${
         result.hash
       }">${Number(result.amountOut).toFixed(2)} $${
         state[username].trade.coinName
@@ -294,9 +294,11 @@ export const customSellForSpecificUser = async (username, customValue, ctx) => {
     await ctx.replyWithHTML(
       `<b>📝 Transaction Approved || You sold </b> <a href="https://explorer.bit-rock.io/tx/${
         result.hash
-      }">${result.amount} $${response.attributes.name} for ${Number(
-        result.amountOut
-      ).toFixed(2)} $BROCK</a> || 💳 Wallet ${
+      }">${result.amount} $${
+        sellState[username].trade.coinName
+      } for approx. ${Number(result.amountOut).toFixed(
+        2
+      )} $BROCK</a> || 💳 Wallet ${
         currentUser.defaultAddress + 1
       } <a href="https://explorer.bit-rock.io/address/${result.hash}">${
         currentUser.walletAddress

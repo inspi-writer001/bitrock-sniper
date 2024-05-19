@@ -251,3 +251,29 @@ export const fetchTokenDetails = async (contractAddress) => {
 
   return response;
 };
+
+export const dextoolsAudit = async (contractAddress) => {
+  try {
+    const response = await axios.get(
+      `https://public-api.dextools.io/trial/v2/token/bitrock/${contractAddress}/audit`,
+      {
+        headers: {
+          "X-API-KEY": env.DEXTOOLS_API
+        }
+      }
+    );
+
+    const responseData = response.data.data;
+
+    return {
+      sellTax: Number(responseData.sellTax.max).toFixed(2),
+      buyTax: Number(responseData.buyTax.max).toFixed(2)
+    };
+  } catch (error) {
+    log(" ==== error from dextoolsAudit ====");
+    return {
+      sellTax: 0,
+      buyTax: 0
+    };
+  }
+};

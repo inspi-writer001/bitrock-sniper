@@ -107,7 +107,7 @@ export const sell = async (ctx) => {
       await ctx.replyWithHTML(
         `<b>📝 Transaction Approved || You sold </b> <a href="https://explorer.bit-rock.io/tx/${
           result.hash
-        }">${result.amount} $${response.attributes.name} for ${Number(
+        }">${result.amount} $${response.attributes.name} for approx. ${Number(
           result.amountOut
         ).toFixed(2)} $BROCK</a> || 💳 Wallet ${
           currentUser.defaultAddress + 1

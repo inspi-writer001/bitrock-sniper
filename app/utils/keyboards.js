@@ -346,15 +346,10 @@ export const buyMessage = (response, body, poolData) =>
   )} ${response.data.data.attributes.symbol}
 <b>💰 Balance</b>           | ${body.balance}
 <b>💧 Liquidity</b>         | $${poolData.attributes["reserve_in_usd"]}
-<b>💪 MC/Liq</b>             | ${formatNormalNumber(
-    (
-      Number(response.data.data.attributes.fdv_usd) /
-      Number(poolData.attributes["reserve_in_usd"])
-    ).toFixed(3)
-  )}
 <b>🧢 Market Cap</b>    | $${formatNumber(
     BigInt(Number(response.data.data.attributes.fdv_usd).toFixed(0))
   )}
+<b>⚖️ Taxes</b>               | Ⓑ ${body.buyTax || 0} ⓢ ${body.sellTax || 0}
 
 <span class="tg-spoiler">💬 If you want to stay updated 24/7, join our Telegram for more info at  || @Bitrockelitebotsupport 💬</span>\n\n`;
 

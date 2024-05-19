@@ -4,7 +4,7 @@ import { err, log } from "../utils/globals.js";
 import { buyMessage, buyOptions, sellOptions } from "../utils/keyboards.js";
 import { buyAddress, pnlState, sellAddress } from "../index.js";
 import { findUser } from "../database/users.js";
-import { fetchSpecificTokenBalance } from "./moralis/moralis.js";
+import { dextoolsAudit, fetchSpecificTokenBalance } from "./moralis/moralis.js";
 import { fromCustomLamport } from "../utils/converters.js";
 import { getAverageGasLimit } from "./ethers/blockDetails.js";
 import { fetchETH } from "./fetchBalance.js";
@@ -67,16 +67,13 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
         );
         const poolData = pool.data.data;
 
-        // const honeyPot = fetchHoneypot(
-        //   contractAddress,
-        //   response.data.data.relationships.top_pools.data[0].id.split(
-        //     "bitrock_"
-        //   )[1]
-        // );
+        const dextools = await dextoolsAudit(contractAddress);
 
         //   log(response);
         const body = {
-          balance: Number(formattedBalance).toFixed(3) || 0
+          balance: Number(formattedBalance).toFixed(3) || 0,
+          buyTax: dextools.buyTax,
+          sellTax: dextools.sellTax
         };
 
         const message = buyMessage(response, body, poolData);
