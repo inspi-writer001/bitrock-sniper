@@ -266,8 +266,8 @@ export const dextoolsAudit = async (contractAddress) => {
     const responseData = response.data.data;
 
     return {
-      sellTax: Number(responseData.sellTax.max).toFixed(2),
-      buyTax: Number(responseData.buyTax.max).toFixed(2)
+      sellTax: (Number(responseData.sellTax.max) * 100).toFixed(2),
+      buyTax: (Number(responseData.buyTax.max) * 100).toFixed(2)
     };
   } catch (error) {
     log(" ==== error from dextoolsAudit ====");
