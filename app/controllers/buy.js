@@ -1,7 +1,12 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import { err, log } from "../utils/globals.js";
-import { buyMessage, buyOptions, sellOptions } from "../utils/keyboards.js";
+import {
+  buyMessage,
+  buyOptions,
+  sellOptions,
+  snipeOptions
+} from "../utils/keyboards.js";
 import { buyAddress, pnlState, sellAddress } from "../index.js";
 import { findUser } from "../database/users.js";
 import { dextoolsAudit, fetchSpecificTokenBalance } from "./moralis/moralis.js";
@@ -53,19 +58,22 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
       )
       .then(async (response) => {
         log("===== response from geckoterminal ====");
-        const pool = await axios.get(
-          `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/pools/${
-            response.data.data.relationships.top_pools.data[0].id.split(
-              "bitrock_"
-            )[1]
-          }`,
-          {
-            headers: {
-              "x-cg-pro-api-key": env.COINGECKO_API_KEY
+        let poolData = "";
+        if (response.data.data.relationships.top_pools.data.length > 0) {
+          const pool = await axios.get(
+            `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/pools/${
+              response.data.data.relationships.top_pools.data[0].id.split(
+                "bitrock_"
+              )[1]
+            }`,
+            {
+              headers: {
+                "x-cg-pro-api-key": env.COINGECKO_API_KEY
+              }
             }
-          }
-        );
-        const poolData = pool.data.data;
+          );
+          poolData = pool.data.data;
+        }
 
         const dextools = await dextoolsAudit(contractAddress);
 
@@ -94,7 +102,21 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
         );
 
         // keyboard
-        sell == true
+
+        typeof sell == "string" && sell === "snipe"
+          ? (async () => {
+              await ctx.replyWithHTML(
+                message,
+                snipeOptions(
+                  contractAddress,
+                  user.defaultAddress,
+                  user.walletAddress,
+                  userBalance,
+                  balanceWorth
+                )
+              );
+            })()
+          : typeof sell == "boolean" && sell == true
           ? (async () => {
               await ctx.replyWithHTML(message, sellOption);
               pnlState[username] = {
@@ -109,7 +131,7 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
               };
             })()
           : await ctx.replyWithHTML(message, option);
-        sell == true
+        typeof sell == "boolean" && sell == true
           ? (sellAddress[username] = response.data.data)
           : (buyAddress[username] = response.data.data);
       });

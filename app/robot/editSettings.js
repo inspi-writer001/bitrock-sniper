@@ -35,7 +35,11 @@ import { isWalletValid } from "../utils/isWalletValid.js";
 import { buyMessage, fastKeyboard } from "../utils/keyboards.js";
 import { Markup } from "telegraf";
 import { findUser } from "../database/users.js";
-import { preSnipeActionDB, removeSnipeFromList } from "../database/preSnipe.js";
+import {
+  preSnipeActionDB,
+  preSnipeActionNew,
+  removeSnipeFromList
+} from "../database/preSnipe.js";
 import { fetchTokenDetails } from "../controllers/moralis/moralis.js";
 
 // bot.action("editMinMCap", async (ctx) => {
@@ -143,7 +147,7 @@ export const pendingSettings = async () => {
 
       isWalletValid(text) &&
         preSnipe.includes(username) &&
-        (await preSnipeActionDB(text, username, ctx));
+        (await preSnipeActionNew(text, username, ctx));
 
       const customValue = ctx.message.text;
 

@@ -1,5 +1,7 @@
 import PreSnipes from "../Schema/PreSnipes.js";
+import { buyTrade } from "../controllers/buy.js";
 import { closePreSnipe, closePreSnipeWithUsername } from "../robot/settings.js";
+import { err, log } from "../utils/globals.js";
 
 export const preSnipeActionDB = async (contractAddress, username, ctx) => {
   const existingUser = await PreSnipes.find({ username: username });
@@ -28,6 +30,15 @@ export const preSnipeActionDB = async (contractAddress, username, ctx) => {
     return await ctx.reply(
       "♻️ now listening for a new Liquidity on address " + contractAddress
     );
+  }
+};
+
+export const preSnipeActionNew = async (contractAddress, username, ctx) => {
+  try {
+    await buyTrade(contractAddress, ctx, "snipe");
+  } catch (error) {
+    log("===== error occured from preSnipeAction ======");
+    err(error);
   }
 };
 

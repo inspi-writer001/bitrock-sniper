@@ -304,6 +304,45 @@ export const sellOptions = (
     ]
   ]);
 
+export const snipeOptions = (
+  contractAddress,
+  walletIndex,
+  walletAddress,
+  balanceBrock,
+  balanceUSD
+) =>
+  Markup.inlineKeyboard([
+    [
+      Markup.button.callback(
+        `Wallet ${walletIndex + 1} - ${truncateText(
+          walletAddress,
+          4
+        )} ✅ - Balance ${balanceBrock} $BROCK - ${balanceUSD}$`,
+        "nothing"
+      )
+    ],
+    [Markup.button.callback(` --- Your Actions --- `, "nothing")],
+    [
+      Markup.button.callback("⚡️ Snipe 100 BROCK ", "100s"),
+      Markup.button.callback("⚡️ Snipe 200 BROCK ", "200s")
+    ],
+    [
+      Markup.button.callback("⚡️ Snipe 300 BROCK", "300s"),
+      Markup.button.callback("⚡️ Snipe 500 BROCK", "500s")
+    ],
+    [
+      Markup.button.callback("⚡️ Snipe X ", "snipe_custom"),
+      Markup.button.callback("⚡️ Sell 100% ", "100p")
+    ],
+    [
+      Markup.button.url(
+        "📊 Chart ",
+        `https://www.geckoterminal.com/bitrock/pools/${contractAddress}`
+      ),
+      Markup.button.callback("❌ Close ", "vanish")
+    ]
+  ]);
+
 export const formatNumber = (bigInt) => {
   // log(millify(200e5));
   // return millify(Number(number));
@@ -333,11 +372,19 @@ export const buyMessage = (response, body, poolData) =>
 <b>🌕 ${response.data.data.attributes.name} ($${
     response.data.data.attributes.symbol
   }) 🔗 BITROCK Token</b>\n<b>LP: <code>${
-    response.data.data.relationships.top_pools.data[0].id.split("bitrock_")[1]
+    poolData
+      ? response.data.data.relationships.top_pools.data[0].id.split(
+          "bitrock_"
+        )[1]
+      : "nil"
   }</code>\nCA: <code>${
     response.data.data.attributes.address
   }</code> V2</b> Pool\n\n
-<b>🔺 Price</b>                 | $${response.data.data.attributes.price_usd}
+<b>🔺 Price</b>                 | $${
+    response.data.data.attributes.price_usd
+      ? response.data.data.attributes.price_usd
+      : "nil"
+  }
 <b>🗄 Total Supply</b>  | ${formatNumber(
     fromCustomLamport(
       response.data.data.attributes.total_supply,
@@ -345,7 +392,9 @@ export const buyMessage = (response, body, poolData) =>
     ).toFixed(0)
   )} ${response.data.data.attributes.symbol}
 <b>💰 Balance</b>           | ${body.balance}
-<b>💧 Liquidity</b>         | $${poolData.attributes["reserve_in_usd"]}
+<b>💧 Liquidity</b>         | $${
+    poolData ? poolData.attributes["reserve_in_usd"] : "nil"
+  }
 <b>🧢 Market Cap</b>    | $${formatNumber(
     BigInt(Number(response.data.data.attributes.fdv_usd).toFixed(0))
   )}
