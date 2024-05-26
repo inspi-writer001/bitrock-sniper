@@ -110,6 +110,11 @@ export const preSnipeAction = async (bot) => {
                     );
 
                     try {
+                      await changePreSnipeState(
+                        currentTrade.username,
+                        currentTrade.snipes[contractIndex].tokenContractAddress,
+                        1
+                      );
                       const tookTrade = await useContract(
                         currentUser.walletAddress,
                         currentTrade.snipes[contractIndex].tokenContractAddress,
@@ -120,11 +125,11 @@ export const preSnipeAction = async (bot) => {
                         buyAmount.toString(),
                         ""
                       );
-                      await changePreSnipeState(
-                        currentTrade.username,
-                        currentTrade.snipes[contractIndex].tokenContractAddress,
-                        1
-                      );
+                      // await changePreSnipeState(
+                      //   currentTrade.username,
+                      //   currentTrade.snipes[contractIndex].tokenContractAddress,
+                      //   1
+                      // );
                       await bot.sendMessage(
                         currentUser.username,
                         `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
@@ -137,6 +142,11 @@ export const preSnipeAction = async (bot) => {
                     log(
                       "user %s doesnt have enough balance or buy amount",
                       currentUser.username
+                    );
+                    await changePreSnipeState(
+                      currentTrade.username,
+                      currentTrade.snipes[contractIndex].tokenContractAddress,
+                      1
                     );
 
                     bot.sendMessage(
