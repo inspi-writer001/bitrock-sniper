@@ -423,7 +423,8 @@ export const sellCallBackQuery = async (ctx) => {
         }</code>\n 💧<b>Status</b>: Pending \n\nTotal Pending: ${
           selectPreSnipes[username].max + 1
         }\n💵 <b>Amount</b>: ${
-          selectPreSnipes[username].tokens.amount || 0
+          selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
+            .amount || 0
         } $BROCK`,
         {
           parse_mode: "HTML",
@@ -462,7 +463,8 @@ export const sellCallBackQuery = async (ctx) => {
         }</code>\n💧 <b>Status</b>: Pending \n\nTotal Pending: ${
           selectPreSnipes[username].max + 1
         }\n💵 <b>Amount</b>: ${
-          selectPreSnipes[username].tokens.amount || 0
+          selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
+            .amount || 0
         } $BROCK`,
         {
           parse_mode: "HTML",

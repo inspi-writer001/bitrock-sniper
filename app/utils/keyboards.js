@@ -492,7 +492,7 @@ export const openSnipes = async (ctx) => {
             }</code>\n💧 <b>Status</b>: Pending \n\nTotal Pending: ${
               selectPreSnipes[username].max + 1
             }\n💵 <b>Amount</b>: ${
-              selectPreSnipes[username].tokens.amount || 0
+              selectPreSnipes[username].tokens[0].amount || 0
             } $BROCK`,
             Markup.inlineKeyboard([
               [
