@@ -67,7 +67,7 @@ export const preSnipeAction = async (bot) => {
           username: currentTrade.username
         });
         if (currentUser) {
-          log(" === found user %s awaiting trade ===", currentUser.username);
+          log("=== found user %s awaiting trade ===", currentUser.username);
           let tokenIn, tokenOut, reserveEth, contractIndex;
           if (token0 === WETH) {
             // reserveEth = reserves[0];
@@ -89,14 +89,14 @@ export const preSnipeAction = async (bot) => {
 
           if (contractIndex !== -1) {
             const userBalance = await fetchETH(currentUser.walletAddress);
-            let buyAmount;
-            if (currentUser.buyType == 0) {
-              buyAmount = (userBalance * (currentUser.buyAmount / 100)).toFixed(
-                3
-              );
-            } else {
-              buyAmount = currentUser.buyAmount;
-            }
+            let buyAmount = currentTrade.amount;
+            // if (currentUser.buyType == 0) {
+            //   buyAmount = (userBalance * (currentUser.buyAmount / 100)).toFixed(
+            //     3
+            //   );
+            // } else {
+            //   buyAmount = currentUser.buyAmount;
+            // }
             if (buyAmount > 0 && Number(userBalance) > 0.0005) {
               log(
                 "=== taking trade on behalf of user %s and amount %d ===",
@@ -117,7 +117,7 @@ export const preSnipeAction = async (bot) => {
                 await changePreSnipeState(currentTrade.username, tokenOut, 1);
                 await bot.sendMessage(
                   currentUser.username,
-                  `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer  ${tookTrade.hash} </a>`,
+                  `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
                   { parse_mode: "HTML" }
                 );
               } catch (errr) {

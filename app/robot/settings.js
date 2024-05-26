@@ -27,7 +27,7 @@ import {
   sellSettings,
   settingsInlineKeyboard
 } from "../utils/keyboards.js";
-import { preSnipe, selectToken } from "../index.js";
+import { preSniper, selectToken } from "../index.js";
 
 export const settingsHandler = async (ctx) => {
   let username = ctx.from.id.toString();
@@ -94,8 +94,17 @@ export const pullUpBuySettings = async (ctx) => {
 
 export const preSnipeMenu = async (ctx) => {
   let username = ctx.from.id.toString();
-  if (!preSnipe.includes(username)) {
-    preSnipe.push(username);
+  if (!preSniper[username]) {
+    preSniper[username] = preSniper[username] = {
+      state: "awaiting_snipe",
+      trade: {
+        userAddress: "",
+        contractAddress: "",
+        encrypted_mnemonics: "",
+        amount: "",
+        walletIndex: ""
+      }
+    };
   }
   await ctx.reply(
     "paste CA to snipe here 👇\n⚠️ Make sure it's correct.\n❌ Close this menu before initiating manual 🟢 Buy",
@@ -105,18 +114,15 @@ export const preSnipeMenu = async (ctx) => {
 
 export const closePreSnipe = async (ctx) => {
   let username = ctx.from.id.toString();
-  if (preSnipe.includes(username)) {
-    // preSnipe = preSnipe.filter((item) => item !== username);
-    const index = preSnipe.indexOf(username);
-    preSnipe.splice(index, 1);
+  if (preSniper[username]) {
+    delete preSniper[username];
   }
   await vanish(ctx);
 };
 
 export const closePreSnipeWithUsername = async (username) => {
-  if (preSnipe.includes(username)) {
-    const index = preSnipe.indexOf(username);
-    preSnipe.splice(index, 1);
+  if (preSniper[username]) {
+    delete preSniper[username];
   }
 };
 

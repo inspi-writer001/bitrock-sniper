@@ -21,7 +21,7 @@ import { txError } from "../errors/txError.js";
 import {
   bot,
   buySettingsState,
-  preSnipe,
+  preSniper,
   selectPreSnipes,
   selectToken,
   sellSettingsState,
@@ -142,14 +142,37 @@ export const pendingSettings = async () => {
       }
 
       isWalletValid(text) &&
-        !preSnipe.includes(username) &&
+        !preSniper.hasOwnProperty(username) &&
         buyTrade(text, ctx, username);
 
       isWalletValid(text) &&
-        preSnipe.includes(username) &&
+        preSniper.hasOwnProperty(username) &&
         (await preSnipeActionNew(text, username, ctx));
 
       const customValue = ctx.message.text;
+      log("=== custom value from user === " + username);
+      log(customValue);
+
+      preSniper[username].state &&
+        preSniper[username].state == "awaiting_custom_snipe" &&
+        (async () => {
+          try {
+            if (!Number(customValue)) {
+              err("========= is not a number ==========");
+              return await ctx.replyWithHTML(`<i> enter a valid number </i>`);
+            }
+            log(preSniper[username]);
+            await preSnipeActionDB(
+              preSniper[username].trade.contractAddress,
+              username,
+              ctx,
+              customValue
+            );
+          } catch (error) {
+            log("====== error from custom snipe ======");
+            err(error);
+          }
+        })();
 
       usersAwaitingAmount.includes(username)
         ? await customBuyForSpecificUser(username, customValue, ctx)
@@ -393,13 +416,15 @@ export const sellCallBackQuery = async (ctx) => {
         ctx.chat.id,
         selectPreSnipes[username].messageId,
         null,
-        `<b>🌕️${token[0].name || ""} ($${
+        `<b>🌕️ ${token[0].name || ""} ($${
           token[0].symbol || ""
-        })</b>\n🪅<b>CA</b>: <code>${
+        })</b>\n🪅 <b>CA</b>: <code>${
           token[0].address || ""
-        }</code>\n💧<b>Status</b>: Pending \n\n Total Pending: ${
+        }</code>\n 💧<b>Status</b>: Pending \n\nTotal Pending: ${
           selectPreSnipes[username].max + 1
-        }`,
+        }\n💵 <b>Amount</b>: ${
+          selectPreSnipes[username].tokens.amount || 0
+        } $BROCK`,
         {
           parse_mode: "HTML",
           reply_markup: {
@@ -430,13 +455,15 @@ export const sellCallBackQuery = async (ctx) => {
         ctx.chat.id,
         selectPreSnipes[username].messageId,
         null,
-        `<b>🌕️${token[0].name || ""} ($${
+        `<b>🌕️ ${token[0].name || ""} ($${
           token[0].symbol || ""
-        })</b>\n🪅<b>CA</b>: <code>${
+        })</b>\n🪅 <b>CA</b>: <code>${
           token[0].address || ""
-        }</code>\n💧<b>Status</b>: Pending \n\n Total Pending: ${
+        }</code>\n💧 <b>Status</b>: Pending \n\nTotal Pending: ${
           selectPreSnipes[username].max + 1
-        }`,
+        }\n💵 <b>Amount</b>: ${
+          selectPreSnipes[username].tokens.amount || 0
+        } $BROCK`,
         {
           parse_mode: "HTML",
           reply_markup: {

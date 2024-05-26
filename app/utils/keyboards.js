@@ -332,7 +332,7 @@ export const snipeOptions = (
     ],
     [
       Markup.button.callback("⚡️ Snipe X ", "snipe_custom"),
-      Markup.button.callback("⚡️ Sell 100% ", "100p")
+      Markup.button.callback("⚡️ Snipe 1000 BROCK ", "1000s")
     ],
     [
       Markup.button.url(
@@ -485,13 +485,15 @@ export const openSnipes = async (ctx) => {
     userSnipes.length > 0
       ? await ctx
           .replyWithHTML(
-            `<b>🌕️${firstToken[0].name || ""} ($${
+            `<b>🌕️ ${firstToken[0].name || ""} ($${
               firstToken[0].symbol || ""
-            })</b>\n🪅<b>CA</b>: <code>${
+            })</b>\n🪅 <b>CA</b>: <code>${
               firstToken[0].address || ""
-            }</code>\n💧<b>Status</b>: Pending \n\n Total Pending: ${
+            }</code>\n💧 <b>Status</b>: Pending \n\nTotal Pending: ${
               selectPreSnipes[username].max + 1
-            }`,
+            }\n💵 <b>Amount</b>: ${
+              selectPreSnipes[username].tokens.amount || 0
+            } $BROCK`,
             Markup.inlineKeyboard([
               [
                 Markup.button.callback(`⏪ Prev`, `prevB`),

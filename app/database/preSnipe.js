@@ -3,12 +3,18 @@ import { buyTrade } from "../controllers/buy.js";
 import { closePreSnipe, closePreSnipeWithUsername } from "../robot/settings.js";
 import { err, log } from "../utils/globals.js";
 
-export const preSnipeActionDB = async (contractAddress, username, ctx) => {
+export const preSnipeActionDB = async (
+  contractAddress,
+  username,
+  ctx,
+  amount
+) => {
   const existingUser = await PreSnipes.find({ username: username });
   if (existingUser.length > 0) {
     existingUser[0].snipes.push({
       isActive: 0,
-      tokenContractAddress: contractAddress
+      tokenContractAddress: contractAddress,
+      amount: amount
     });
     await existingUser[0].save();
     await closePreSnipeWithUsername(username);

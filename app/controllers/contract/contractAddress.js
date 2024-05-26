@@ -9,4 +9,4 @@ export const smartContractMainnetAddress =
 
 export const factoryTestnet = "0x02c73ecb9B82e545E32665eDc42Ae903F8AA86a9";
 
-export const factoeryMainnet = "0x02c73ecb9B82e545E32665eDc42Ae903F8AA86a9";
+export const factoeryMainnet = "0x02c73ecb9b82e545e32665edc42ae903f8aa86a9";

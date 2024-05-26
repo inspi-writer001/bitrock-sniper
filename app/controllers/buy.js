@@ -7,7 +7,7 @@ import {
   sellOptions,
   snipeOptions
 } from "../utils/keyboards.js";
-import { buyAddress, pnlState, sellAddress } from "../index.js";
+import { buyAddress, pnlState, preSniper, sellAddress } from "../index.js";
 import { findUser } from "../database/users.js";
 import { dextoolsAudit, fetchSpecificTokenBalance } from "./moralis/moralis.js";
 import { fromCustomLamport } from "../utils/converters.js";
@@ -115,6 +115,14 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
                   balanceWorth
                 )
               );
+              preSniper[username] = {
+                state: "awaiting_snipe",
+                trade: {
+                  userAddress: user.walletAddress,
+                  contractAddress: contractAddress,
+                  encrypted_mnemonics: user.encrypted_mnemonnics
+                }
+              };
             })()
           : typeof sell == "boolean" && sell == true
           ? (async () => {

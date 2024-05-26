@@ -58,6 +58,7 @@ import { preSnipeAction } from "./controllers/preTrade.js";
 import { openSnipes } from "./utils/keyboards.js";
 import { exportWallet } from "./controllers/wallet/createWallet.js";
 import { generateImage } from "./utils/generateImage.js";
+import { sniperNew } from "./robot/snipe.js";
 
 dotenv.config();
 const MONGO_URI = process.env.MONGO_URI;
@@ -87,7 +88,7 @@ export const sellAddress = {};
 export const buyAddress = {};
 export const selectToken = {};
 export const selectPreSnipes = {};
-export const preSnipe = [];
+export const preSniper = {};
 
 export const bot = new Telegraf(process.env.TELEGRAM_API);
 bot.use(async (ctx, next) => {
@@ -156,6 +157,10 @@ bot.action("sell", sellMenu);
 bot.action(
   ["10p", "20p", "30p", "50p", "70p", "90p", "100p", "sell_custom"],
   sell
+);
+bot.action(
+  ["100s", "200s", "300s", "500s", "1000s", "snipe_custom"],
+  sniperNew
 );
 bot.action("vanish", vanish);
 bot.action("mainMenu", startHandler);
