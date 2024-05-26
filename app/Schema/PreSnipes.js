@@ -13,7 +13,7 @@ export default preSnipeSchema = mongoose.model(
 );
 
 // snipes
-// contractAddress, entryMarketCap, entryPriceUSD, poolAddress, amount_purchased, tradeOpened
+// contractAddress, entryMarketCap, entryPriceUSD, poolAddress, amount_purchased, tradeOpened, amount
 
 //  isActive: {
 //     type: Number,

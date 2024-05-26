@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers, Interface } from "ethers";
 import {
   factoeryMainnet,
   factoryTestnet,
@@ -30,6 +30,11 @@ const factoryAbi = [
   "event PairCreated(address indexed token0, address indexed token1, address pair, uint)"
 ];
 
+const contractAbi = ["function Enable_Trading()"];
+const contractInterface = new Interface(contractAbi);
+const methodSignature =
+  contractInterface.getFunction("Enable_Trading").selector;
+
 const pairAbi = [
   "function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
   "function token0() external view returns (address)",
@@ -54,26 +59,105 @@ export const preSnipeAction = async (bot) => {
 
     const factory = new ethers.Contract(factoryContract, factoryAbi, provider);
 
-    provider.on(
-      {
-        address: factoryContract
-      },
-      async (log) => {
-        try {
-          // Decode the log
-          const parsedLog = factory.interface.parseLog(log);
+    provider.on("pending", async (txHash) => {
+      try {
+        const tx = await provider.getTransaction(txHash);
+        log(txHash + "\n" + "from SNiper");
+        const waitingUsers = await PreSnipes.find({
+          "snipes.isActive": 0
+        }).lean();
 
-          console.log(`Event Name: ${parsedLog.name}`);
-          console.log(`Event Signature: ${parsedLog.signature}`);
-          console.log(`Event Values:`, parsedLog.args);
-          console.log(`Block Number: ${log.blockNumber}`);
+        waitingUsers.map(async (currentTrade) => {
+          if (tx && tx.to) {
+            // Check if the input data matches the method signature
 
-          // You can add more logic here, such as saving the event data to a database
-        } catch (error) {
-          console.error("Error parsing log:", error);
-        }
+            let contractIndex = currentTrade.snipes.findIndex(
+              (snipeContractAddress) =>
+                snipeContractAddress.tokenContractAddress.toLowerCase() ==
+                tx.to.toLowerCase()
+            );
+            log("===== contract index =====", contractIndex);
+
+            if (contractIndex !== -1) {
+              if (tx.data.startsWith(methodSignature)) {
+                const decodedData = contractInterface.decodeFunctionData(
+                  "Enable_Trading",
+                  tx.data
+                );
+                console.log(
+                  `Method EnableTrading was called with args:`,
+                  decodedData
+                );
+                // Execute your logic here
+
+                const currentUser = await User.findOne({
+                  username: currentTrade.username
+                });
+
+                if (currentUser) {
+                  log(
+                    "=== found user %s awaiting trade ===",
+                    currentUser.username
+                  );
+                  const userBalance = await fetchETH(currentUser.walletAddress);
+                  let buyAmount = currentTrade.snipes[contractIndex].amount;
+
+                  if (buyAmount > 0 && Number(userBalance) > 0.0005) {
+                    log(
+                      "=== taking trade on behalf of user %s and amount %d ===",
+                      currentUser.username,
+                      buyAmount
+                    );
+
+                    try {
+                      const tookTrade = await useContract(
+                        currentUser.walletAddress,
+                        currentTrade.snipes[contractIndex].tokenContractAddress,
+                        decrypt(currentUser.encrypted_mnemonnics),
+                        "",
+                        "",
+                        "",
+                        buyAmount.toString(),
+                        ""
+                      );
+                      await changePreSnipeState(
+                        currentTrade.username,
+                        currentTrade.snipes[contractIndex].tokenContractAddress,
+                        1
+                      );
+                      await bot.sendMessage(
+                        currentUser.username,
+                        `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
+                        { parse_mode: "HTML" }
+                      );
+                    } catch (errr) {
+                      log(" ==== error from making transaction ====", errr);
+                    }
+                  } else {
+                    log(
+                      "user %s doesnt have enough balance or buy amount",
+                      currentUser.username
+                    );
+
+                    bot.sendMessage(
+                      currentUser.username,
+                      "😵‍💫 oops, you do not have enough balance to snipe contract" +
+                        currentTrade.snipes[contractIndex]?.tokenContractAddress
+                    );
+                  }
+                } else {
+                  log("=== user isn't watching this token ===");
+                }
+              }
+            }
+          }
+        });
+
+        // You can add more logic here, such as saving the event data to a database
+      } catch (error) {
+        console.error("Error parsing log:", error);
       }
-    );
+    });
 
     // factory.on("*", async (token0, token1, pairAddress) => {
     //   log(
