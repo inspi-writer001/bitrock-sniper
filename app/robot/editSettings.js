@@ -153,7 +153,7 @@ export const pendingSettings = async () => {
       log("=== custom value from user === " + username);
       log(customValue);
 
-      preSniper[username].state &&
+      preSniper[username]?.state &&
         preSniper[username].state == "awaiting_custom_snipe" &&
         (async () => {
           try {
