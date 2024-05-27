@@ -42,7 +42,7 @@ Trade any tokens on the Bitrock blockchain, easy fast and effortlessly.
 🍌 Enjoy your Benefits as a $APE Holder and Sniper DAO Member!
 
 If you need any help, just type /help.\n` +
-      `Here are your ETH Trading wallets. Simply fund your wallet, select a default wallet and dive into trading 🚀\n\n` +
+      `Here are your $BROCK Trading wallets. Select your default wallet and dive into trading🎯\n\n` +
       `<code>═══ Your Wallets ═══</code>\n` +
       response.wallets
         .map((e, i) => {
