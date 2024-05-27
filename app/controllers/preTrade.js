@@ -118,7 +118,11 @@ export const preSnipeAction = async (bot) => {
                       const tookTrade = await useContract(
                         currentUser.walletAddress,
                         currentTrade.snipes[contractIndex].tokenContractAddress,
-                        decrypt(currentUser.encrypted_mnemonnics),
+                        decrypt(
+                          currentTrade.snipes[contractIndex]
+                            ?.encrypted_mnemonnics ||
+                            currentUser.encrypted_mnemonnics
+                        ),
                         "",
                         "",
                         "",

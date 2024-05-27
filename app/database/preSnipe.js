@@ -7,14 +7,16 @@ export const preSnipeActionDB = async (
   contractAddress,
   username,
   ctx,
-  amount
+  amount,
+  encrypted_mnemonnics
 ) => {
   const existingUser = await PreSnipes.find({ username: username });
   if (existingUser.length > 0) {
     existingUser[0].snipes.push({
       isActive: 0,
       tokenContractAddress: contractAddress,
-      amount: amount
+      amount: amount,
+      encrypted_mnemonnics: encrypted_mnemonnics
     });
     await existingUser[0].save();
     await closePreSnipeWithUsername(username);
@@ -27,7 +29,9 @@ export const preSnipeActionDB = async (
       snipes: [
         {
           isActive: 0,
-          tokenContractAddress: contractAddress
+          tokenContractAddress: contractAddress,
+          amount: amount,
+          encrypted_mnemonnics: encrypted_mnemonnics
         }
       ]
     });

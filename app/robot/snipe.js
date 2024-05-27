@@ -37,7 +37,8 @@ export const sniperNew = async (ctx) => {
         preSniper[username].trade.contractAddress,
         username,
         ctx,
-        validAmount
+        validAmount,
+        currentUser.encrypted_mnemonnics
       );
     } catch (error) {
       log(error);

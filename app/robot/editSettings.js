@@ -157,6 +157,7 @@ export const pendingSettings = async () => {
         preSniper[username].state == "awaiting_custom_snipe" &&
         (async () => {
           try {
+            const currentUser = await findUser(username);
             if (!Number(customValue)) {
               err("========= is not a number ==========");
               return await ctx.replyWithHTML(`<i> enter a valid number </i>`);
@@ -166,7 +167,8 @@ export const pendingSettings = async () => {
               preSniper[username].trade.contractAddress,
               username,
               ctx,
-              customValue
+              customValue,
+              currentUser.encrypted_mnemonnics
             );
           } catch (error) {
             log("====== error from custom snipe ======");
