@@ -25,8 +25,7 @@ export const startHandler = async (ctx) => {
     ]);
 
     const welcome =
-      `
-    <b> 🚀 Elite Sniper Bot - Official Sniper Bot on the Bitrock Blockchain 🎯</b>\n\n` +
+      `<b> 🚀 Elite Sniper Bot - Official Sniper Bot on the Bitrock Blockchain 🎯</b>\n\n` +
       `⚙️ Team Elite
 
 Trade any tokens on the Bitrock blockchain, easy fast and effortlessly.
@@ -53,6 +52,7 @@ If you need any help, just type /help.\n` +
         .toString()
         .replaceAll(",", "");
 
+    await ctx.replyWithPhoto("https://ibb.co/Qdy7Q49");
     await ctx.replyWithHTML(
       welcome,
       await inlineKeyboard(username),
