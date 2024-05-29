@@ -26,46 +26,37 @@ export const startHandler = async (ctx) => {
 
     const welcome =
       `<b> 🚀 Elite Sniper Bot - Official Sniper Bot on the Bitrock Blockchain 🎯</b>\n\n` +
-      `⚙️ Team Elite
-
-Trade any tokens on the Bitrock blockchain, easy fast and effortlessly.
-
-📚 Elite Sniper Academy
-
-💬 Official Chain
-
-📢 Degen Calls
-
-🌐 Website
-
-🍌 Enjoy your Benefits as a $APE Holder and Sniper DAO Member!
-
-If you need any help, just type /help.\n` +
+      `⚙️ Team Elite\n\n` +
+      `Trade any tokens on the Bitrock blockchain, easy fast and effortlessly.\n\n` +
+      `📚 Elite Sniper Academy\n\n` +
+      `💬 Official Chain\n\n` +
+      `📢 Degen Calls\n\n` +
+      `🌐 Website\n\n` +
+      `🍌 Enjoy your Benefits as a $APE Holder and Sniper DAO Member!\n\n` +
+      `If you need any help, just type /help.\n\n` +
       `Here are your $BROCK Trading wallets. Select your default wallet and dive into trading🎯\n\n` +
       `<code>═══ Your Wallets ═══</code>\n` +
       response.wallets
         .map((e, i) => {
-          return `\b▰ Address ${i + 1}: ▰\n Bal: ${balances[i]} BROCK $${
+          return `<b>▰ Address ${i + 1}: ▰</b>\nBal: ${balances[i]} BROCK $${
             prices[i]
-          } \n<code>${e.address}</code>\n\n`;
+          }\n<code>${e.address}</code>\n\n`;
         })
-        .toString()
-        .replaceAll(",", "");
+        .join("");
 
-    await ctx.replyWithPhoto("https://ibb.co/Qdy7Q49");
-    await ctx.replyWithHTML(
-      welcome,
-      await inlineKeyboard(username),
-      selectWallet
-    );
+    await ctx.replyWithPhoto("https://ibb.co/Qdy7Q49", {
+      caption: welcome,
+      parse_mode: "HTML",
+      ...(await inlineKeyboard(username))
+    });
   } catch (error) {
     console.log(error);
     const ErrorMessage = `Something went wrong,
 
 ${
   error.toString().includes("timed out")
-    ? "Your request Timed out 😵‍💫, please try again in a min"
-    : "That's strange 🤔, please give us a minute"
+    ? "Your request timed out 😵‍💫, please try again in a minute."
+    : "That's strange 🤔, please give us a minute."
 }`;
 
     await ctx.reply(ErrorMessage, fastKeyboard);
