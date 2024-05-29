@@ -29,9 +29,9 @@ export const startHandler = async (ctx) => {
       `⚙️ Team Elite\n\n` +
       `Trade any tokens on the Bitrock blockchain, easy fast and effortlessly.\n\n` +
       `📚 Elite Sniper Academy\n\n` +
-      `💬 Official Chain\n\n` +
-      `📢 Degen Calls\n\n` +
-      `🌐 Website\n\n` +
+      `💬 <a href="http://t.me/ApeOnBitrock">Official $APE TG</a>\n\n` +
+      `📢 <a href="http://t.me/SniperDaoCalls"> Sniper Dao Calls </a>\n\n` +
+      `🌐 <a href="https://apetoken.net">Website</a>\n\n` +
       `🍌 Enjoy your Benefits as a $APE Holder and Sniper DAO Member!\n\n` +
       `If you need any help, just type /help.\n\n` +
       `Here are your $BROCK Trading wallets. Select your default wallet and dive into trading🎯\n\n` +
