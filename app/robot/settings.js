@@ -21,13 +21,17 @@ import { findUser } from "../database/users.js";
 import { fromCustomLamport } from "../utils/converters.js";
 import { err, log } from "../utils/globals.js";
 import {
+  buyOptions,
   buySettings,
   fastFastClose,
   removeFromPreSnipeList,
+  sellOptions,
   sellSettings,
   settingsInlineKeyboard
 } from "../utils/keyboards.js";
-import { preSniper, selectToken } from "../index.js";
+import { buyAddress, preSniper, selectToken, state } from "../index.js";
+import { fetchETH } from "../controllers/fetchBalance.js";
+import { EthPrice } from "../utils/prices.js";
 
 export const settingsHandler = async (ctx) => {
   let username = ctx.from.id.toString();
@@ -144,6 +148,49 @@ export const backToSettings = async (ctx) => {
     await ctx.editMessageReplyMarkup(keyBoardState.reply_markup);
   } catch (error) {
     log("==== error from backToSettings ====");
+    err(error);
+  }
+};
+
+export const switchToSell = async (ctx) => {
+  try {
+    let username = ctx.from.id.toString();
+    const user = await findUser(username);
+    const userBalance = await fetchETH(user.walletAddress);
+    const balanceWorth = await EthPrice(userBalance);
+    const contractAddress = buyAddress[username].attributes.address;
+    const sellOption = sellOptions(
+      contractAddress,
+      user.defaultAddress,
+      user.walletAddress,
+      userBalance,
+      balanceWorth
+    );
+    await ctx.editMessageReplyMarkup(sellOption.reply_markup);
+  } catch (error) {
+    log("==== error from switchToSell ====");
+    err(error);
+  }
+};
+
+export const switchToBuy = async (ctx) => {
+  try {
+    let username = ctx.from.id.toString();
+    const user = await findUser(username);
+    const userBalance = await fetchETH(user.walletAddress);
+    const balanceWorth = await EthPrice(userBalance);
+    const contractAddress = buyAddress[username].attributes.address;
+    const buyOption = buyOptions(
+      contractAddress,
+      user.defaultAddress,
+      user.walletAddress,
+      userBalance,
+      balanceWorth,
+      user.slippage ? user.slippage : "default"
+    );
+    await ctx.editMessageReplyMarkup(buyOption.reply_markup);
+  } catch (error) {
+    log("==== error from switchToBuy ====");
     err(error);
   }
 };

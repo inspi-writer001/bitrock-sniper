@@ -236,7 +236,7 @@ export const buyOptions = (
       Markup.button.callback(`🧪 Slippage % (${slippage}) `, "editSlippage")
     ],
     [
-      Markup.button.callback("🟢 Buy Menu ", "buy"),
+      Markup.button.callback("🔄 Sell Menu ", "switchToSell"),
 
       Markup.button.callback("🏠 Main Menu ", "mainMenu")
     ],
@@ -291,7 +291,7 @@ export const sellOptions = (
       Markup.button.callback("⚡️ Sell 100% ", "100p")
     ],
     [
-      Markup.button.callback("⏪ Open Trades ", "sell"),
+      Markup.button.callback("🔄 Buy Menu ", "switchToBuy"),
       Markup.button.callback("🏠 Main Menu ", "mainMenu"),
       Markup.button.callback("🖼️ Share PNL ", "pnl")
     ],
@@ -379,7 +379,7 @@ export const buyMessage = (response, body, poolData) =>
       : "nil"
   }</code>\nCA: <code>${
     response.data.data.attributes.address
-  }</code> V2</b> Pool\n\n
+  }</code></b>\nV2 Pool\n\n
 <b>🔺 Price</b>                 | $${
     response.data.data.attributes.price_usd
       ? response.data.data.attributes.price_usd

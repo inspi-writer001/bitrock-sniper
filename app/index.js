@@ -24,6 +24,8 @@ import {
   pullUpViewSettings,
   sellMenu,
   settingsHandler,
+  switchToBuy,
+  switchToSell,
   triggerAutoBuy,
   vanish
 } from "./robot/settings.js";
@@ -125,6 +127,8 @@ bot.action("autoBuy", triggerAutoBuy);
 bot.action("sellSettings", pullUpSellSettings);
 bot.action("buySettings", pullUpBuySettings);
 bot.action("backToSettings", backToSettings);
+bot.action("switchToSell", switchToSell);
+bot.action("switchToBuy", switchToBuy);
 bot.action("resetMinMCap", doClearMinMcap);
 bot.action("resetMaxMCap", doClearMaxMcap);
 bot.action("resetMaxLiquidity", doClearMaxLiq);

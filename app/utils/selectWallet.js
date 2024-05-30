@@ -39,7 +39,7 @@ const updateWalletButtons = (selectedWallet) => {
         const walletNumber = button.callback_data.split(":")[1];
 
         if (walletNumber === selectedWallet) {
-          button.text = "✅ " + button.text;
+          !button.text.includes("✅") && (button.text = "✅ " + button.text);
         } else {
           button.text = button.text.replace("✅ ", "");
         }
@@ -49,40 +49,52 @@ const updateWalletButtons = (selectedWallet) => {
 };
 
 export const selectWallet1 = async (ctx) => {
-  let username = ctx.from.id.toString();
-  updateWalletButtons("w1");
-  const userUnityWallet = (await fetchUser(username)).wallets;
-  await changeDefaultWallet(
-    username,
-    0,
-    encrypt(userUnityWallet[0].privateKey),
-    userUnityWallet[0].address
-  );
-  await ctx.editMessageReplyMarkup(inlineKeyboard.reply_markup);
+  try {
+    let username = ctx.from.id.toString();
+    updateWalletButtons("w1");
+    const userUnityWallet = (await fetchUser(username)).wallets;
+    await changeDefaultWallet(
+      username,
+      0,
+      encrypt(userUnityWallet[0].privateKey),
+      userUnityWallet[0].address
+    );
+    await ctx.editMessageReplyMarkup(inlineKeyboard.reply_markup);
+  } catch (error) {
+    console.log("--- trying to update current wallet ----");
+  }
 };
 
 export const selectWallet2 = async (ctx) => {
-  let username = ctx.from.id.toString();
-  updateWalletButtons("w2");
-  const userUnityWallet = (await fetchUser(username)).wallets;
-  await changeDefaultWallet(
-    username,
-    1,
-    encrypt(userUnityWallet[1].privateKey),
-    userUnityWallet[1].address
-  );
-  await ctx.editMessageReplyMarkup(inlineKeyboard.reply_markup);
+  try {
+    let username = ctx.from.id.toString();
+    updateWalletButtons("w2");
+    const userUnityWallet = (await fetchUser(username)).wallets;
+    await changeDefaultWallet(
+      username,
+      1,
+      encrypt(userUnityWallet[1].privateKey),
+      userUnityWallet[1].address
+    );
+    await ctx.editMessageReplyMarkup(inlineKeyboard.reply_markup);
+  } catch (error) {
+    console.log("--- trying to update current wallet ----");
+  }
 };
 
 export const selectWallet3 = async (ctx) => {
-  let username = ctx.from.id.toString();
-  updateWalletButtons("w3");
-  const userUnityWallet = (await fetchUser(username)).wallets;
-  await changeDefaultWallet(
-    username,
-    2,
-    encrypt(userUnityWallet[2].privateKey),
-    userUnityWallet[2].address
-  );
-  await ctx.editMessageReplyMarkup(inlineKeyboard.reply_markup);
+  try {
+    let username = ctx.from.id.toString();
+    updateWalletButtons("w3");
+    const userUnityWallet = (await fetchUser(username)).wallets;
+    await changeDefaultWallet(
+      username,
+      2,
+      encrypt(userUnityWallet[2].privateKey),
+      userUnityWallet[2].address
+    );
+    await ctx.editMessageReplyMarkup(inlineKeyboard.reply_markup);
+  } catch (error) {
+    console.log("--- trying to update current wallet ----");
+  }
 };
