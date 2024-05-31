@@ -139,9 +139,12 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
               };
             })()
           : await ctx.replyWithHTML(message, option);
-        typeof sell == "boolean" && sell == true
-          ? (sellAddress[username] = response.data.data)
-          : (buyAddress[username] = response.data.data);
+        // typeof sell == "boolean" && sell == true
+        //   ? (sellAddress[username] = response.data.data)
+        //   : (buyAddress[username] = response.data.data);
+
+        sellAddress[username] = response.data.data;
+        buyAddress[username] = response.data.data;
       });
   } catch (error) {
     err(error);
