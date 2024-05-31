@@ -54,7 +54,7 @@ export const settingsInlineKeyboard = async (telegramId) => {
   const autoBuy = await isAutoBuy(telegramId);
   return Markup.inlineKeyboard([
     [
-      Markup.button.callback(" ⚙️ Pre Snipe ", "buySettings"),
+      // Markup.button.callback(" ⚙️ Pre Snipe ", "buySettings"),
       Markup.button.callback(" Export Wallet ", "exportW")
     ],
     // [
@@ -88,7 +88,7 @@ export const removeFromPreSnipeList = Markup.inlineKeyboard([
 
 export const fastKeyboard = Markup.inlineKeyboard([
   [
-    Markup.button.callback("⚙️ Pre Snipe ", "buySettings"),
+    // Markup.button.callback("⚙️ Pre Snipe ", "buySettings"),
     Markup.button.callback("🔁 Refresh ", "mainMenu")
     // Markup.button.callback("⚙️ Sell Settings", "sellSettings")
   ]
