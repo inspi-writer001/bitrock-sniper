@@ -57,7 +57,7 @@ export const preSnipeAction = async (bot) => {
     // const provider = new ethers.WebSocketProvider(globals.infuraSepoliaWss);
     const provider = new ethers.JsonRpcProvider(globals.infuraSepolia); // testnet
 
-    const factory = new ethers.Contract(factoryContract, factoryAbi, provider);
+    // const factory = new ethers.Contract(factoryContract, factoryAbi, provider);
 
     provider.on("pending", async (txHash) => {
       try {
@@ -66,6 +66,9 @@ export const preSnipeAction = async (bot) => {
         const waitingUsers = await PreSnipes.find({
           "snipes.isActive": 0
         }).lean();
+
+        log("==== open snipes all users =====");
+        log(waitingUsers);
 
         waitingUsers.map(async (currentTrade) => {
           if (tx && tx.to) {
@@ -89,10 +92,13 @@ export const preSnipeAction = async (bot) => {
                   decodedData
                 );
                 // Execute your logic here
-
-                const currentUser = await User.findOne({
+                const currentUser = {
                   username: currentTrade.username
-                });
+                };
+
+                // const currentUser = await User.findOne({
+                //   username: currentTrade.username
+                // });
 
                 if (currentUser) {
                   log(

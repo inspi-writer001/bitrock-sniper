@@ -168,7 +168,8 @@ export const pendingSettings = async () => {
               username,
               ctx,
               customValue,
-              currentUser.encrypted_mnemonnics
+              currentUser.encrypted_mnemonnics,
+              currentUser.walletAddress
             );
           } catch (error) {
             log("====== error from custom snipe ======");

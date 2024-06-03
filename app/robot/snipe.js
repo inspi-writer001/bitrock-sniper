@@ -38,7 +38,8 @@ export const sniperNew = async (ctx) => {
         username,
         ctx,
         validAmount,
-        currentUser.encrypted_mnemonnics
+        currentUser.encrypted_mnemonnics,
+        currentUser.walletAddress
       );
     } catch (error) {
       log(error);
