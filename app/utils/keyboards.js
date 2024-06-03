@@ -515,5 +515,9 @@ export const openSnipes = async (ctx) => {
   } catch (error) {
     err("===== error from fetcing openSnipes ====");
     err(error);
+    await ctx.reply(
+      "No open Snipes",
+      Markup.inlineKeyboard([[Markup.button.callback("❌ Close ", "vanish")]])
+    );
   }
 };
