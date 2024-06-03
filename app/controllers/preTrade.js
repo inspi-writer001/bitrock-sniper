@@ -52,12 +52,210 @@ const factoryContract = factoeryMainnet;
 const routerContract = smartContractTestnetAddress; // mainnet router
 // const routerContract = smartContractMainnetAddress;
 
+// export const preSnipeAction = async (bot) => {
+//   try {
+//     // const provider = new ethers.WebSocketProvider(globals.infuraSepoliaWss);
+//     const provider = new ethers.JsonRpcProvider(globals.infuraSepolia); // testnet
+
+//     // const factory = new ethers.Contract(factoryContract, factoryAbi, provider);
+
+//     provider.on("pending", async (txHash) => {
+//       try {
+//         const tx = await provider.getTransaction(txHash);
+//         log(txHash + "\n" + "from SNiper");
+//         const waitingUsers = await PreSnipes.find({
+//           "snipes.isActive": 0
+//         }).lean();
+
+//         log("==== open snipes all users =====");
+//         log(waitingUsers);
+
+//         waitingUsers.map(async (currentTrade) => {
+//           if (tx && tx.to) {
+//             // Check if the input data matches the method signature
+
+//             let contractIndex = currentTrade.snipes.findIndex(
+//               (snipeContractAddress) =>
+//                 snipeContractAddress.tokenContractAddress.toLowerCase() ==
+//                 tx.to.toLowerCase()
+//             );
+//             log("===== contract index =====", contractIndex);
+
+//             if (contractIndex !== -1) {
+//               if (tx.data.startsWith(methodSignature)) {
+//                 const decodedData = contractInterface.decodeFunctionData(
+//                   "Enable_Trading",
+//                   tx.data
+//                 );
+//                 console.log(
+//                   `Method EnableTrading was called with args:`,
+//                   decodedData
+//                 );
+//                 // Execute your logic here
+//                 const currentUser = {
+//                   username: currentTrade.username
+//                 };
+
+//                 // const currentUser = await User.findOne({
+//                 //   username: currentTrade.username
+//                 // });
+
+//                 if (currentUser) {
+//                   log(
+//                     "=== found user %s awaiting trade ===",
+//                     currentUser.username
+//                   );
+//                   // const userBalance = await fetchETH(currentUser.walletAddress);
+//                   let buyAmount = currentTrade.snipes[contractIndex].amount;
+
+//                   log(
+//                     "=== taking trade on behalf of user %s and amount %d ===",
+//                     currentUser.username,
+//                     buyAmount
+//                   );
+
+//                   try {
+//                     await changePreSnipeState(
+//                       currentTrade.username,
+//                       currentTrade.snipes[contractIndex].tokenContractAddress,
+//                       1
+//                     );
+//                     const tookTrade = await useContract(
+//                       currentUser.walletAddress,
+//                       currentTrade.snipes[contractIndex].tokenContractAddress,
+//                       decrypt(
+//                         currentTrade.snipes[contractIndex]
+//                           ?.encrypted_mnemonnics ||
+//                           currentUser.encrypted_mnemonnics
+//                       ),
+//                       "",
+//                       "",
+//                       "",
+//                       buyAmount.toString(),
+//                       ""
+//                     );
+//                     // await changePreSnipeState(
+//                     //   currentTrade.username,
+//                     //   currentTrade.snipes[contractIndex].tokenContractAddress,
+//                     //   1
+//                     // );
+//                     await bot.sendMessage(
+//                       currentUser.username,
+//                       `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
+//                       { parse_mode: "HTML" }
+//                     );
+//                   } catch (errr) {
+//                     log(" ==== error from making transaction ====", errr);
+//                     await bot.sendMessage(
+//                       currentUser.username,
+//                       `<b>snipe failed 😓, something went wrong sniping pool</b>`,
+//                       { parse_mode: "HTML" }
+//                     );
+//                   }
+//                 } else {
+//                   log("=== user isn't watching this token ===");
+//                 }
+//               }
+//             }
+//           }
+//         });
+
+//         // You can add more logic here, such as saving the event data to a database
+//       } catch (error) {
+//         console.error("Error parsing log:", error);
+//       }
+//     });
+
+//     // factory.on("*", async (token0, token1, pairAddress) => {
+//     //   log(
+//     //     `New pair detected\n=================\ntoken0: ${token0}\ntoken1: ${token1}\npairAddress: ${pairAddress}`
+//     //   );
+//     //   const waitingUsers = await PreSnipes.find({
+//     //     "snipes.isActive": 0
+//     //   }).lean();
+
+//     //   waitingUsers.map(async (currentTrade) => {
+//     //     const currentUser = await User.findOne({
+//     //       username: currentTrade.username
+//     //     });
+//     //     if (currentUser) {
+//     //       log("=== found user %s awaiting trade ===", currentUser.username);
+//     //       let tokenIn, tokenOut, reserveEth, contractIndex;
+//     //       if (token0 === WETH) {
+//     //         // reserveEth = reserves[0];
+//     //         tokenIn = token0;
+//     //         tokenOut = token1;
+//     //       } else if (token1 == WETH) {
+//     //         // reserveEth = reserves[1];
+//     //         tokenIn = token1;
+//     //         tokenOut = token0;
+//     //       } else {
+//     //         log(" ==== undefined tokenIn ====");
+//     //         return;
+//     //       }
+//     //       contractIndex = currentTrade.snipes.findIndex(
+//     //         (snipeContractAddress) =>
+//     //           snipeContractAddress.tokenContractAddress == tokenOut
+//     //       );
+//     //       log("===== contract index =====", contractIndex);
+
+//     //       if (contractIndex !== -1) {
+//     //         const userBalance = await fetchETH(currentUser.walletAddress);
+//     //         let buyAmount = currentTrade.amount;
+//     //         // if (currentUser.buyType == 0) {
+//     //         //   buyAmount = (userBalance * (currentUser.buyAmount / 100)).toFixed(
+//     //         //     3
+//     //         //   );
+//     //         // } else {
+//     //         //   buyAmount = currentUser.buyAmount;
+//     //         // }
+//     //         if (buyAmount > 0 && Number(userBalance) > 0.0005) {
+//     //           log(
+//     //             "=== taking trade on behalf of user %s and amount %d ===",
+//     //             currentUser.username,
+//     //             buyAmount
+//     //           );
+//     //           try {
+//     //             const tookTrade = await useContract(
+//     //               currentUser.walletAddress,
+//     //               currentTrade.snipes[contractIndex].tokenContractAddress,
+//     //               decrypt(currentUser.encrypted_mnemonnics),
+//     //               "",
+//     //               "",
+//     //               "",
+//     //               buyAmount.toString(),
+//     //               ""
+//     //             );
+//     //             await changePreSnipeState(currentTrade.username, tokenOut, 1);
+//     //             await bot.sendMessage(
+//     //               currentUser.username,
+//     //               `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
+//     //               { parse_mode: "HTML" }
+//     //             );
+//     //           } catch (errr) {
+//     //             log(" ==== error from making transaction ====", errr);
+//     //           }
+//     //         } else {
+//     //           log(
+//     //             "user %s doesnt have enough balance or buy amount",
+//     //             currentUser.username
+//     //           );
+//     //         }
+//     //       } else {
+//     //         log("=== user isn't watching this token ===");
+//     //       }
+//     //     }
+//     //   });
+//     // });
+//   } catch (error) {
+//     log(" ======= error from snipe ======");
+//     err(error);
+//   }
+// };
+
 export const preSnipeAction = async (bot) => {
   try {
-    // const provider = new ethers.WebSocketProvider(globals.infuraSepoliaWss);
     const provider = new ethers.JsonRpcProvider(globals.infuraSepolia); // testnet
-
-    // const factory = new ethers.Contract(factoryContract, factoryAbi, provider);
 
     provider.on("pending", async (txHash) => {
       try {
@@ -72,16 +270,14 @@ export const preSnipeAction = async (bot) => {
 
         waitingUsers.map(async (currentTrade) => {
           if (tx && tx.to) {
-            // Check if the input data matches the method signature
-
-            let contractIndex = currentTrade.snipes.findIndex(
-              (snipeContractAddress) =>
-                snipeContractAddress.tokenContractAddress.toLowerCase() ==
-                tx.to.toLowerCase()
+            const matchingSnipes = currentTrade.snipes.filter(
+              (snipe) =>
+                snipe.tokenContractAddress.toLowerCase() == tx.to.toLowerCase()
             );
-            log("===== contract index =====", contractIndex);
 
-            if (contractIndex !== -1) {
+            log("===== matching snipes =====", matchingSnipes);
+
+            for (const snipe of matchingSnipes) {
               if (tx.data.startsWith(methodSignature)) {
                 const decodedData = contractInterface.decodeFunctionData(
                   "Enable_Trading",
@@ -91,22 +287,17 @@ export const preSnipeAction = async (bot) => {
                   `Method EnableTrading was called with args:`,
                   decodedData
                 );
-                // Execute your logic here
+
                 const currentUser = {
                   username: currentTrade.username
                 };
-
-                // const currentUser = await User.findOne({
-                //   username: currentTrade.username
-                // });
 
                 if (currentUser) {
                   log(
                     "=== found user %s awaiting trade ===",
                     currentUser.username
                   );
-                  // const userBalance = await fetchETH(currentUser.walletAddress);
-                  let buyAmount = currentTrade.snipes[contractIndex].amount;
+                  let buyAmount = snipe.amount;
 
                   log(
                     "=== taking trade on behalf of user %s and amount %d ===",
@@ -117,15 +308,14 @@ export const preSnipeAction = async (bot) => {
                   try {
                     await changePreSnipeState(
                       currentTrade.username,
-                      currentTrade.snipes[contractIndex].tokenContractAddress,
+                      snipe.tokenContractAddress,
                       1
                     );
                     const tookTrade = await useContract(
                       currentUser.walletAddress,
-                      currentTrade.snipes[contractIndex].tokenContractAddress,
+                      snipe.tokenContractAddress,
                       decrypt(
-                        currentTrade.snipes[contractIndex]
-                          ?.encrypted_mnemonnics ||
+                        snipe.encrypted_mnemonnics ||
                           currentUser.encrypted_mnemonnics
                       ),
                       "",
@@ -134,11 +324,6 @@ export const preSnipeAction = async (bot) => {
                       buyAmount.toString(),
                       ""
                     );
-                    // await changePreSnipeState(
-                    //   currentTrade.username,
-                    //   currentTrade.snipes[contractIndex].tokenContractAddress,
-                    //   1
-                    // );
                     await bot.sendMessage(
                       currentUser.username,
                       `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
@@ -159,96 +344,11 @@ export const preSnipeAction = async (bot) => {
             }
           }
         });
-
-        // You can add more logic here, such as saving the event data to a database
       } catch (error) {
         console.error("Error parsing log:", error);
       }
     });
-
-    // factory.on("*", async (token0, token1, pairAddress) => {
-    //   log(
-    //     `New pair detected\n=================\ntoken0: ${token0}\ntoken1: ${token1}\npairAddress: ${pairAddress}`
-    //   );
-    //   const waitingUsers = await PreSnipes.find({
-    //     "snipes.isActive": 0
-    //   }).lean();
-
-    //   waitingUsers.map(async (currentTrade) => {
-    //     const currentUser = await User.findOne({
-    //       username: currentTrade.username
-    //     });
-    //     if (currentUser) {
-    //       log("=== found user %s awaiting trade ===", currentUser.username);
-    //       let tokenIn, tokenOut, reserveEth, contractIndex;
-    //       if (token0 === WETH) {
-    //         // reserveEth = reserves[0];
-    //         tokenIn = token0;
-    //         tokenOut = token1;
-    //       } else if (token1 == WETH) {
-    //         // reserveEth = reserves[1];
-    //         tokenIn = token1;
-    //         tokenOut = token0;
-    //       } else {
-    //         log(" ==== undefined tokenIn ====");
-    //         return;
-    //       }
-    //       contractIndex = currentTrade.snipes.findIndex(
-    //         (snipeContractAddress) =>
-    //           snipeContractAddress.tokenContractAddress == tokenOut
-    //       );
-    //       log("===== contract index =====", contractIndex);
-
-    //       if (contractIndex !== -1) {
-    //         const userBalance = await fetchETH(currentUser.walletAddress);
-    //         let buyAmount = currentTrade.amount;
-    //         // if (currentUser.buyType == 0) {
-    //         //   buyAmount = (userBalance * (currentUser.buyAmount / 100)).toFixed(
-    //         //     3
-    //         //   );
-    //         // } else {
-    //         //   buyAmount = currentUser.buyAmount;
-    //         // }
-    //         if (buyAmount > 0 && Number(userBalance) > 0.0005) {
-    //           log(
-    //             "=== taking trade on behalf of user %s and amount %d ===",
-    //             currentUser.username,
-    //             buyAmount
-    //           );
-    //           try {
-    //             const tookTrade = await useContract(
-    //               currentUser.walletAddress,
-    //               currentTrade.snipes[contractIndex].tokenContractAddress,
-    //               decrypt(currentUser.encrypted_mnemonnics),
-    //               "",
-    //               "",
-    //               "",
-    //               buyAmount.toString(),
-    //               ""
-    //             );
-    //             await changePreSnipeState(currentTrade.username, tokenOut, 1);
-    //             await bot.sendMessage(
-    //               currentUser.username,
-    //               `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
-    //               { parse_mode: "HTML" }
-    //             );
-    //           } catch (errr) {
-    //             log(" ==== error from making transaction ====", errr);
-    //           }
-    //         } else {
-    //           log(
-    //             "user %s doesnt have enough balance or buy amount",
-    //             currentUser.username
-    //           );
-    //         }
-    //       } else {
-    //         log("=== user isn't watching this token ===");
-    //       }
-    //     }
-    //   });
-    // });
   } catch (error) {
-    log(" ======= error from snipe ======");
-    err(error);
+    console.error("Error in preSnipeAction:", error);
   }
 };
