@@ -99,64 +99,51 @@ export const preSnipeAction = async (bot) => {
                     "=== found user %s awaiting trade ===",
                     currentUser.username
                   );
-                  const userBalance = await fetchETH(currentUser.walletAddress);
+                  // const userBalance = await fetchETH(currentUser.walletAddress);
                   let buyAmount = currentTrade.snipes[contractIndex].amount;
 
-                  if (buyAmount > 0 && Number(userBalance) > 0.0005) {
-                    log(
-                      "=== taking trade on behalf of user %s and amount %d ===",
-                      currentUser.username,
-                      buyAmount
-                    );
+                  log(
+                    "=== taking trade on behalf of user %s and amount %d ===",
+                    currentUser.username,
+                    buyAmount
+                  );
 
-                    try {
-                      await changePreSnipeState(
-                        currentTrade.username,
-                        currentTrade.snipes[contractIndex].tokenContractAddress,
-                        1
-                      );
-                      const tookTrade = await useContract(
-                        currentUser.walletAddress,
-                        currentTrade.snipes[contractIndex].tokenContractAddress,
-                        decrypt(
-                          currentTrade.snipes[contractIndex]
-                            ?.encrypted_mnemonnics ||
-                            currentUser.encrypted_mnemonnics
-                        ),
-                        "",
-                        "",
-                        "",
-                        buyAmount.toString(),
-                        ""
-                      );
-                      // await changePreSnipeState(
-                      //   currentTrade.username,
-                      //   currentTrade.snipes[contractIndex].tokenContractAddress,
-                      //   1
-                      // );
-                      await bot.sendMessage(
-                        currentUser.username,
-                        `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
-                        { parse_mode: "HTML" }
-                      );
-                    } catch (errr) {
-                      log(" ==== error from making transaction ====", errr);
-                    }
-                  } else {
-                    log(
-                      "user %s doesnt have enough balance or buy amount",
-                      currentUser.username
-                    );
+                  try {
                     await changePreSnipeState(
                       currentTrade.username,
                       currentTrade.snipes[contractIndex].tokenContractAddress,
                       1
                     );
-
-                    bot.sendMessage(
+                    const tookTrade = await useContract(
+                      currentUser.walletAddress,
+                      currentTrade.snipes[contractIndex].tokenContractAddress,
+                      decrypt(
+                        currentTrade.snipes[contractIndex]
+                          ?.encrypted_mnemonnics ||
+                          currentUser.encrypted_mnemonnics
+                      ),
+                      "",
+                      "",
+                      "",
+                      buyAmount.toString(),
+                      ""
+                    );
+                    // await changePreSnipeState(
+                    //   currentTrade.username,
+                    //   currentTrade.snipes[contractIndex].tokenContractAddress,
+                    //   1
+                    // );
+                    await bot.sendMessage(
                       currentUser.username,
-                      "😵‍💫 oops, you do not have enough balance to snipe contract" +
-                        currentTrade.snipes[contractIndex]?.tokenContractAddress
+                      `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
+                      { parse_mode: "HTML" }
+                    );
+                  } catch (errr) {
+                    log(" ==== error from making transaction ====", errr);
+                    await bot.sendMessage(
+                      currentUser.username,
+                      `<b>snipe failed 😓, something went wrong sniping pool</b>`,
+                      { parse_mode: "HTML" }
                     );
                   }
                 } else {
