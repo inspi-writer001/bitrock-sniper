@@ -18,7 +18,7 @@ const inlineKeyboard = Markup.inlineKeyboard([
   ],
   [
     // Markup.button.callback(" New Pairs ", "newPairs"),
-    Markup.button.callback("Sniped Positions ", "openPositions"),
+    Markup.button.callback("Active Snipes ", "openPositions"),
     Markup.button.callback("⚙️ Settings ", "settings")
   ],
   // [Markup.button.callback(" 🔑 Mnemonics ", "button8")],

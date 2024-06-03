@@ -119,6 +119,7 @@ bot.start(startHandler);
 // bot.command("sell", sellMenu);
 bot.command("selloff", sellMenu);
 bot.command("buy", buyPrompt);
+bot.command("positions", openSnipes);
 bot.command("snipe", preSnipeMenu);
 bot.command("settings", settingsHandler);
 bot.action("openPositions", openSnipes);
