@@ -60,15 +60,15 @@ export const changePreSnipeState = async (
   contractAddress,
   newState
 ) => {
-  let response = await PreSnipes.findOne({ username });
-  const objectIndex = response.snipes.findIndex(
-    (snipe) => snipe.contractAddress == contractAddress
-  );
+  // let response = await PreSnipes.findOne({ username });
+  // const objectIndex = response.snipes.findIndex(
+  //   (snipe) => snipe.contractAddress == contractAddress
+  // );
 
-  if (objectIndex !== -1) {
-    response.snipes[objectIndex].isActive = newState;
-    await response.save();
-  }
+  // if (objectIndex !== -1) {
+  //   response.snipes[objectIndex].isActive = newState;
+  //   await response.save();
+  // }
 
   //   const updatedDocument = await PreSnipes.findOneAndUpdate(
   //     {
@@ -82,6 +82,38 @@ export const changePreSnipeState = async (
   //       new: true
   //     }
   //   );
+
+  try {
+    // Find the user document
+    const user = await PreSnipes.findOne({ username });
+
+    // If user is found
+    if (user) {
+      // Find the index of the snipe with the given contractAddress
+      const snipeIndex = user.snipes.findIndex(
+        (snipe) => snipe.tokenContractAddress === contractAddress
+      );
+
+      // If the snipe with the given contractAddress exists
+      if (snipeIndex !== -1) {
+        // Remove the snipe from the array
+        user.snipes.splice(snipeIndex, 1);
+
+        // Save the updated document
+        await user.save();
+
+        // Optionally, you may want to return a message indicating success
+        return `Snipe for contract ${contractAddress} removed successfully.`;
+      } else {
+        return `Snipe for contract ${contractAddress} not found.`;
+      }
+    } else {
+      return `User ${username} not found.`;
+    }
+  } catch (error) {
+    console.error("Error removing snipe:", error);
+    return "An error occurred while removing the snipe.";
+  }
 };
 
 export const getAllActiveSnipesForUser = async (username) => {

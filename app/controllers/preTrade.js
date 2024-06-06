@@ -331,11 +331,16 @@ export const preSnipeAction = async (bot) => {
                     );
                   } catch (errr) {
                     log(" ==== error from making transaction ====", errr);
-                    await bot.sendMessage(
-                      currentUser.username,
-                      `<b>snipe failed 😓, something went wrong sniping pool</b>`,
-                      { parse_mode: "HTML" }
-                    );
+                    try {
+                      await bot.sendMessage(
+                        currentUser.username,
+                        `<b>snipe failed 😓, something went wrong sniping pool</b>`,
+                        { parse_mode: "HTML" }
+                      );
+                    } catch (error) {
+                      log("final error block in catch === PreTrade.js:339");
+                      err(error);
+                    }
                   }
                 } else {
                   log("=== user isn't watching this token ===");
