@@ -383,6 +383,7 @@ export const preSnipeAction = async (bot) => {
         const tx = await provider.getTransaction(txHash);
         if (!tx || !tx.to) return;
 
+        // Fetch users with active snipes only once
         const waitingUsers = await PreSnipes.find({
           "snipes.isActive": 0
         }).lean();
@@ -392,86 +393,69 @@ export const preSnipeAction = async (bot) => {
           waitingUsers.map(async (currentTrade) => {
             const matchingSnipes = currentTrade.snipes.filter(
               (snipe) =>
-                snipe.tokenContractAddress.toLowerCase() == tx.to.toLowerCase()
+                snipe.tokenContractAddress.toLowerCase() === tx.to.toLowerCase()
             );
 
-            for (const snipe of matchingSnipes) {
-              if (tx.data.startsWith(methodSignature)) {
-                const decodedData = contractInterface.decodeFunctionData(
-                  "Enable_Trading",
-                  tx.data
-                );
+            await Promise.all(
+              matchingSnipes.map(async (snipe) => {
+                if (tx.data.startsWith(methodSignature)) {
+                  const decodedData = contractInterface.decodeFunctionData(
+                    "Enable_Trading",
+                    tx.data
+                  );
 
-                const currentUser = {
-                  username: currentTrade.username
-                };
+                  const currentUser = {
+                    username: currentTrade.username
+                  };
 
-                if (currentUser) {
-                  let buyAmount = snipe.amount;
+                  if (currentUser) {
+                    const buyAmount = snipe.amount;
 
-                  // Use Promise.all to parallelize transaction and bot notification
-                  await Promise.all([
-                    (async () => {
-                      try {
-                        const tookTrade = await useContract(
-                          currentUser.walletAddress,
-                          snipe.tokenContractAddress,
-                          decrypt(
-                            snipe.encrypted_mnemonnics ||
-                              currentUser.encrypted_mnemonnics
-                          ),
-                          "",
-                          "",
-                          "",
-                          buyAmount.toString(),
-                          ""
-                        );
-
-                        await bot.sendMessage(
-                          currentUser.username,
-                          `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
-                          { parse_mode: "HTML" }
-                        );
-
-                        await changePreSnipeState(
-                          currentTrade.username,
-                          snipe.tokenContractAddress,
-                          1
-                        );
-                      } catch (errr) {
-                        log(" ==== error from making transaction ====", errr);
-
+                    // Use Promise.all to parallelize transaction and bot notification
+                    await Promise.all([
+                      (async () => {
                         try {
-                          if (
-                            errr &&
-                            errr.info.error.message.includes(
-                              "Upfront cost exceeds account balance"
-                            )
-                          ) {
-                            await bot.sendMessage(
-                              currentUser.username,
-                              `<b>snipe failed 😓, something went wrong sniping pool</b>`,
-                              { parse_mode: "HTML" }
-                            );
-                          } else {
-                            await bot.sendMessage(
-                              currentUser.username,
-                              `<b>snipe failed 😓, something went wrong sniping pool</b>`,
-                              { parse_mode: "HTML" }
-                            );
-                          }
-                        } catch (error) {
-                          log("final error block in catch === PreTrade.js:339");
-                          err(error);
+                          const tookTrade = await useContract(
+                            currentUser.walletAddress,
+                            snipe.tokenContractAddress,
+                            decrypt(
+                              snipe.encrypted_mnemonnics ||
+                                currentUser.encrypted_mnemonnics
+                            ),
+                            "",
+                            "",
+                            "",
+                            buyAmount.toString(),
+                            ""
+                          );
+
+                          await bot.sendMessage(
+                            currentUser.username,
+                            `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
+                            { parse_mode: "HTML" }
+                          );
+
+                          await changePreSnipeState(
+                            currentTrade.username,
+                            snipe.tokenContractAddress,
+                            1
+                          );
+                        } catch (errr) {
+                          log("Error from making transaction:", errr);
+
+                          const message = `<b>snipe failed 😓, something went wrong sniping pool</b>`;
+                          await bot.sendMessage(currentUser.username, message, {
+                            parse_mode: "HTML"
+                          });
                         }
-                      }
-                    })()
-                  ]);
-                } else {
-                  log("=== user isn't watching this token ===");
+                      })()
+                    ]);
+                  } else {
+                    log("User isn't watching this token");
+                  }
                 }
-              }
-            }
+              })
+            );
           })
         );
       } catch (error) {
