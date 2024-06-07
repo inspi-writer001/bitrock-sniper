@@ -44,8 +44,8 @@ export const inlineKeyboard = async (telegramId) => {
     // [Markup.button.callback(" 🔑 Mnemonics ", "button8")],
 
     [
-      Markup.button.webApp(" Help ", "https://apetoken.net"),
-      Markup.button.callback("💰 View Settings ", "button7")
+      Markup.button.webApp(" Help ", "https://apetoken.net")
+      // Markup.button.callback("💰 View Settings ", "button7")
       // Markup.button.callback("🔁 Refresh ", "restart")
     ]
   ]);
@@ -69,8 +69,8 @@ export const settingsInlineKeyboard = async (telegramId) => {
     //   )
     // ],
     [
-      Markup.button.callback("🏠 Main Menu ", "mainMenu"),
-      Markup.button.callback("💰 View Settings ", "button7")
+      Markup.button.callback("🏠 Main Menu ", "mainMenu")
+      // Markup.button.callback("💰 View Settings ", "button7")
       // Markup.button.callback("🔁 Refresh ", "restart")
     ]
   ]);
