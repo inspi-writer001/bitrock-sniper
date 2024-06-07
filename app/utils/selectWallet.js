@@ -24,7 +24,7 @@ const inlineKeyboard = Markup.inlineKeyboard([
   // [Markup.button.callback(" 🔑 Mnemonics ", "button8")],
 
   [
-    Markup.button.webApp(" Help ", "https://curiosityanon.com"),
+    Markup.button.webApp(" Help ", "https://apetoken.net"),
     Markup.button.callback("💰 View Settings ", "button7")
   ]
 ]);
