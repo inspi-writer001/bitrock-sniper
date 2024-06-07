@@ -253,29 +253,147 @@ const routerContract = smartContractTestnetAddress; // mainnet router
 //   }
 // };
 
+// most recent implementation for 3 seconds
+
+// export const preSnipeAction = async (bot) => {
+//   try {
+//     const provider = new ethers.JsonRpcProvider(globals.infuraSepolia); // mainnet
+
+//     provider.on("pending", async (txHash) => {
+//       try {
+//         const tx = await provider.getTransaction(txHash);
+//         log(txHash + "\n" + "from SNiper");
+//         const waitingUsers = await PreSnipes.find({
+//           "snipes.isActive": 0
+//         }).lean();
+
+//         log("==== open snipes all users =====");
+//         log(waitingUsers);
+
+//         waitingUsers.map(async (currentTrade) => {
+//           if (tx && tx.to) {
+//             const matchingSnipes = currentTrade.snipes.filter(
+//               (snipe) =>
+//                 snipe.tokenContractAddress.toLowerCase() == tx.to.toLowerCase()
+//             );
+
+//             // log("===== matching snipes =====", matchingSnipes);
+
+//             for (const snipe of matchingSnipes) {
+//               if (tx.data.startsWith(methodSignature)) {
+//                 const decodedData = contractInterface.decodeFunctionData(
+//                   "Enable_Trading",
+//                   tx.data
+//                 );
+//                 console.log(
+//                   `Method EnableTrading was called with args:`,
+//                   decodedData
+//                 );
+
+//                 const currentUser = {
+//                   username: currentTrade.username
+//                 };
+
+//                 if (currentUser) {
+//                   log(
+//                     "=== found user %s awaiting trade ===",
+//                     currentUser.username
+//                   );
+//                   let buyAmount = snipe.amount;
+
+//                   // log(
+//                   //   "=== taking trade on behalf of user %s and amount %d ===",
+//                   //   currentUser.username,
+//                   //   buyAmount
+//                   // );
+
+//                   try {
+//                     const tookTrade = await useContract(
+//                       currentUser.walletAddress,
+//                       snipe.tokenContractAddress,
+//                       decrypt(
+//                         snipe.encrypted_mnemonnics ||
+//                           currentUser.encrypted_mnemonnics
+//                       ),
+//                       "",
+//                       "",
+//                       "",
+//                       buyAmount.toString(),
+//                       ""
+//                     );
+//                     await bot.sendMessage(
+//                       currentUser.username,
+//                       `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
+//                       { parse_mode: "HTML" }
+//                     );
+//                     await changePreSnipeState(
+//                       currentTrade.username,
+//                       snipe.tokenContractAddress,
+//                       1
+//                     );
+//                   } catch (errr) {
+//                     log(" ==== error from making transaction ====", errr);
+
+//                     try {
+//                       if (
+//                         errr &&
+//                         errr.info.error.message.includes(
+//                           "Upfront cost exceeds account balance"
+//                         )
+//                       ) {
+//                         await bot.sendMessage(
+//                           currentUser.username,
+//                           `<b>snipe failed 😓, something went wrong sniping pool</b>`,
+//                           { parse_mode: "HTML" }
+//                         );
+//                       }
+
+//                       await bot.sendMessage(
+//                         currentUser.username,
+//                         `<b>snipe failed 😓, something went wrong sniping pool</b>`,
+//                         { parse_mode: "HTML" }
+//                       );
+//                     } catch (error) {
+//                       log("final error block in catch === PreTrade.js:339");
+//                       err(error);
+//                     }
+//                   }
+//                 } else {
+//                   log("=== user isn't watching this token ===");
+//                 }
+//               }
+//             }
+//           }
+//         });
+//       } catch (error) {
+//         console.error("Error parsing log:", error);
+//       }
+//     });
+//   } catch (error) {
+//     console.error("Error in preSnipeAction:", error);
+//   }
+// };
+
 export const preSnipeAction = async (bot) => {
   try {
-    const provider = new ethers.JsonRpcProvider(globals.infuraSepolia); // testnet
+    const provider = new ethers.JsonRpcProvider(globals.infuraSepolia); // mainnet
 
     provider.on("pending", async (txHash) => {
       try {
         const tx = await provider.getTransaction(txHash);
-        log(txHash + "\n" + "from SNiper");
+        if (!tx || !tx.to) return;
+
         const waitingUsers = await PreSnipes.find({
           "snipes.isActive": 0
         }).lean();
 
-        log("==== open snipes all users =====");
-        log(waitingUsers);
-
-        waitingUsers.map(async (currentTrade) => {
-          if (tx && tx.to) {
+        // Using Promise.all to process all users in parallel
+        await Promise.all(
+          waitingUsers.map(async (currentTrade) => {
             const matchingSnipes = currentTrade.snipes.filter(
               (snipe) =>
                 snipe.tokenContractAddress.toLowerCase() == tx.to.toLowerCase()
             );
-
-            log("===== matching snipes =====", matchingSnipes);
 
             for (const snipe of matchingSnipes) {
               if (tx.data.startsWith(methodSignature)) {
@@ -283,72 +401,79 @@ export const preSnipeAction = async (bot) => {
                   "Enable_Trading",
                   tx.data
                 );
-                console.log(
-                  `Method EnableTrading was called with args:`,
-                  decodedData
-                );
 
                 const currentUser = {
                   username: currentTrade.username
                 };
 
                 if (currentUser) {
-                  log(
-                    "=== found user %s awaiting trade ===",
-                    currentUser.username
-                  );
                   let buyAmount = snipe.amount;
 
-                  log(
-                    "=== taking trade on behalf of user %s and amount %d ===",
-                    currentUser.username,
-                    buyAmount
-                  );
+                  // Use Promise.all to parallelize transaction and bot notification
+                  await Promise.all([
+                    (async () => {
+                      try {
+                        const tookTrade = await useContract(
+                          currentUser.walletAddress,
+                          snipe.tokenContractAddress,
+                          decrypt(
+                            snipe.encrypted_mnemonnics ||
+                              currentUser.encrypted_mnemonnics
+                          ),
+                          "",
+                          "",
+                          "",
+                          buyAmount.toString(),
+                          ""
+                        );
 
-                  try {
-                    await changePreSnipeState(
-                      currentTrade.username,
-                      snipe.tokenContractAddress,
-                      1
-                    );
-                    const tookTrade = await useContract(
-                      currentUser.walletAddress,
-                      snipe.tokenContractAddress,
-                      decrypt(
-                        snipe.encrypted_mnemonnics ||
-                          currentUser.encrypted_mnemonnics
-                      ),
-                      "",
-                      "",
-                      "",
-                      buyAmount.toString(),
-                      ""
-                    );
-                    await bot.sendMessage(
-                      currentUser.username,
-                      `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
-                      { parse_mode: "HTML" }
-                    );
-                  } catch (errr) {
-                    log(" ==== error from making transaction ====", errr);
-                    try {
-                      await bot.sendMessage(
-                        currentUser.username,
-                        `<b>snipe failed 😓, something went wrong sniping pool</b>`,
-                        { parse_mode: "HTML" }
-                      );
-                    } catch (error) {
-                      log("final error block in catch === PreTrade.js:339");
-                      err(error);
-                    }
-                  }
+                        await bot.sendMessage(
+                          currentUser.username,
+                          `<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
+                          { parse_mode: "HTML" }
+                        );
+
+                        await changePreSnipeState(
+                          currentTrade.username,
+                          snipe.tokenContractAddress,
+                          1
+                        );
+                      } catch (errr) {
+                        log(" ==== error from making transaction ====", errr);
+
+                        try {
+                          if (
+                            errr &&
+                            errr.info.error.message.includes(
+                              "Upfront cost exceeds account balance"
+                            )
+                          ) {
+                            await bot.sendMessage(
+                              currentUser.username,
+                              `<b>snipe failed 😓, something went wrong sniping pool</b>`,
+                              { parse_mode: "HTML" }
+                            );
+                          } else {
+                            await bot.sendMessage(
+                              currentUser.username,
+                              `<b>snipe failed 😓, something went wrong sniping pool</b>`,
+                              { parse_mode: "HTML" }
+                            );
+                          }
+                        } catch (error) {
+                          log("final error block in catch === PreTrade.js:339");
+                          err(error);
+                        }
+                      }
+                    })()
+                  ]);
                 } else {
                   log("=== user isn't watching this token ===");
                 }
               }
             }
-          }
-        });
+          })
+        );
       } catch (error) {
         console.error("Error parsing log:", error);
       }
