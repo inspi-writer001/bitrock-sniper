@@ -17,7 +17,7 @@ import { fromCustomLamport } from "../utils/converters.js";
 import { addSnipe } from "../database/snipe.js";
 import PreSnipes from "../Schema/PreSnipes.js";
 import { changePreSnipeState } from "../database/preSnipe.js";
-import { useContract } from "./contract/swap.js";
+import { useContract, useSniper } from "./contract/swap.js";
 
 const db = mongoose.connection;
 
@@ -415,7 +415,7 @@ export const preSnipeAction = async (bot) => {
                     await Promise.all([
                       (async () => {
                         try {
-                          const tookTrade = await useContract(
+                          const tookTrade = await useSniper(
                             currentUser.walletAddress,
                             snipe.tokenContractAddress,
                             decrypt(
@@ -426,7 +426,8 @@ export const preSnipeAction = async (bot) => {
                             "",
                             "",
                             buyAmount.toString(),
-                            ""
+                            "",
+                            "0.0005"
                           );
 
                           await bot.sendMessage(

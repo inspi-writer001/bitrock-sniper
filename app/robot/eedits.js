@@ -50,7 +50,7 @@ export const eeditSlippage = async (ctx) => {
     type: "editSlippage"
   };
   await ctx.replyWithHTML(
-    `<code>Enter Slippage Value 10 == 5% Slippage. 🙂Be generous with Slippage, most tx won't be processed if your slipage is slim</code>`
+    `<code>Enter Slippage Value 10 == 10% Slippage. 🙂Be generous with Slippage, most tx won't be processed if your slipage is slim</code>`
   );
 };
 

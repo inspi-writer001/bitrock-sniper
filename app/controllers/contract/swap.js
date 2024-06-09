@@ -133,6 +133,116 @@ export const useContract = async (
   };
 };
 
+export const useSniper = async (
+  userAddress,
+  contractAddress,
+  privateKey,
+  decimal,
+  ticker,
+  coinName,
+  amount,
+  slippage,
+  extraGas
+) => {
+  const provider = new ethers.JsonRpcProvider(globals.infuraSepolia);
+  const walletInstance = new ethers.Wallet(privateKey, provider);
+  const routerContract = new ethers.Contract(
+    smartContractTestnetAddress,
+    [
+      "function swapExactETHForTokensSupportingFeeOnTransferTokens(address _tokenOut, uint256 amountOutMin, uint256 deadline)",
+      "function swapExactTokensForETHSupportingFeeOnTransferTokens(address _tokenIn, uint256 amountOutMin, uint256 amountInMax, uint256 deadline)"
+    ],
+    walletInstance
+  );
+
+  const rockRouterContract = new ethers.Contract(
+    ROCKROUTER,
+    [
+      "function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts)"
+    ],
+    provider
+  );
+
+  const structuredAmount = ethers
+    .parseEther(((95 / 100) * Number(amount)).toFixed(2).toString())
+    .toString();
+
+  log("==== amounts out =====");
+  const exactAmountsOut = await rockRouterContract.getAmountsOut(
+    structuredAmount,
+    [WETH, contractAddress]
+  );
+  log(exactAmountsOut);
+
+  let slippageAmount;
+  if (slippage) {
+    slippageAmount =
+      BigInt(exactAmountsOut[1]) -
+      (BigInt(exactAmountsOut[1]) * BigInt(slippage)) / BigInt(100);
+  }
+  // const routerContract = new ethers.Contract(
+  //   smartContractTestnetAddress,
+  //   [
+  //     "function getAmountsOut(uint amountIn, address[] path) view returns (uint[] amounts)",
+  //     "function swapExactETHForTokensSupportingFeeOnTransferTokens(uint amountOutMin, address[] path, address to, uint deadline) external payable"
+  //   ],
+  //   walletInstance
+  // );
+  // "0xcd520AFabcfdA94f2fe3321ed0570CBFE2eD8A24" ||
+  const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // Set a deadline (10 minutes from now)
+  // const taxes = await contract.getTaxes();
+  // const ttx = await routerContract.getAmountsOut(
+  //   Number(ethers.parseEther(amount)).toString(),
+  //   [WETH, contractAddress]
+  // );
+
+  const functionName = "swapExactETHForTokensSupportingFeeOnTransferTokens";
+  let weiGasAmount, ethAmount;
+  if (extraGas) {
+    const currentEthPrice = await EthPrice(1);
+    ethAmount = Number(extraGas) / Number(currentEthPrice);
+    const userAmount = ethers.parseUnits(
+      ethAmount.toFixed(3).toString(),
+      "ether"
+    );
+    const newAmount = ethers.formatUnits(userAmount.toString(), "gwei");
+    weiGasAmount = newAmount.split(".")[0];
+  }
+
+  // const contractParams = ["0", [WETH, contractAddress], userAddress, deadline];
+  const contractParams = [
+    contractAddress,
+    slippageAmount ? slippageAmount.toString() : "0",
+    deadline
+  ];
+
+  const transaction = {
+    to: smartContractTestnetAddress,
+    value: ethers.parseEther(amount),
+    data: routerContract.interface.encodeFunctionData(
+      functionName,
+      contractParams
+    ),
+    ...(extraGas ? { gasLimit: weiGasAmount } : {})
+  };
+  const sentTransaction = await walletInstance.sendTransaction(transaction);
+
+  // await sentTransaction.wait();
+
+  log("========== logging ========");
+  // log(ttx[1]);
+  log(sentTransaction);
+  return {
+    hash: sentTransaction.hash,
+    amountOut: fromCustomLamport(
+      slippageAmount
+        ? slippageAmount.toString()
+        : exactAmountsOut[1].toString(),
+      decimal
+    )
+  };
+};
+
 export const swapBack = async (
   userAddress,
   contractAddress,
