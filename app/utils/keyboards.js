@@ -493,7 +493,11 @@ export const openSnipes = async (ctx) => {
               selectPreSnipes[username].max + 1
             }\n💵 <b>Amount</b>: ${
               selectPreSnipes[username].tokens[0].amount || 0
-            } $BROCK`,
+            } $BROCK\n💳️ <b>Wallet</b> ${
+              selectPreSnipes[username].tokens[
+                selectPreSnipes[username].tokenIndex
+              ].walletIndex || "-"
+            }`,
             Markup.inlineKeyboard([
               [
                 Markup.button.callback(`⏪ Prev`, `prevB`),

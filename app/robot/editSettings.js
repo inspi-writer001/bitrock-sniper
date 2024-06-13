@@ -423,12 +423,15 @@ export const sellCallBackQuery = async (ctx) => {
           token[0].symbol || ""
         })</b>\n🪅 <b>CA</b>: <code>${
           token[0].address || ""
-        }</code>\n 💧<b>Status</b>: Pending \n\nTotal Pending: ${
+        }</code>\n 💧 <b>Status</b>: Pending \n\nTotal Pending: ${
           selectPreSnipes[username].max + 1
         }\n💵 <b>Amount</b>: ${
           selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
             .amount || 0
-        } $BROCK`,
+        } $BROCK\n💳️ <b>Wallet</b> ${
+          selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
+            .walletIndex || "-"
+        }`,
         {
           parse_mode: "HTML",
           reply_markup: {
@@ -468,7 +471,10 @@ export const sellCallBackQuery = async (ctx) => {
         }\n💵 <b>Amount</b>: ${
           selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
             .amount || 0
-        } $BROCK`,
+        } $BROCK\n💳️ <b>Wallet</b> ${
+          selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
+            .walletIndex || "-"
+        }`,
         {
           parse_mode: "HTML",
           reply_markup: {

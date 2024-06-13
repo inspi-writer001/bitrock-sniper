@@ -2,6 +2,7 @@ import PreSnipes from "../Schema/PreSnipes.js";
 import { buyTrade } from "../controllers/buy.js";
 import { closePreSnipe, closePreSnipeWithUsername } from "../robot/settings.js";
 import { err, log } from "../utils/globals.js";
+import { findUser } from "./users.js";
 
 export const preSnipeActionDB = async (
   contractAddress,
@@ -11,14 +12,26 @@ export const preSnipeActionDB = async (
   encrypted_mnemonnics,
   walletAddress
 ) => {
-  const existingUser = await PreSnipes.find({ username: username });
+  const bulkPromise = await Promise.all([
+    PreSnipes.find({ username: username }),
+    findUser(username)
+  ]);
+  const existingUser = bulkPromise[0];
+  const user = bulkPromise[1];
+
+  let walletIndex =
+    user.wallets.findIndex(
+      (wallet) => wallet.address.toLowerCase() == walletAddress.toLowerCase()
+    ) + 1;
+
   if (existingUser.length > 0) {
     existingUser[0].snipes.push({
       isActive: 0,
       tokenContractAddress: contractAddress,
       amount: amount,
       encrypted_mnemonnics: encrypted_mnemonnics,
-      walletAddress
+      walletAddress,
+      walletIndex
     });
     await existingUser[0].save();
     await closePreSnipeWithUsername(username);
@@ -34,7 +47,8 @@ export const preSnipeActionDB = async (
           tokenContractAddress: contractAddress,
           amount: amount,
           encrypted_mnemonnics: encrypted_mnemonnics,
-          walletAddress
+          walletAddress,
+          walletIndex
         }
       ]
     });
