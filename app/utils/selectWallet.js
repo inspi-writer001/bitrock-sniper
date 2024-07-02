@@ -13,7 +13,7 @@ const inlineKeyboard = Markup.inlineKeyboard([
   ],
   [
     Markup.button.callback("🟢 Buy ", "buy"),
-    Markup.button.callback("🎯 Pre Snipe ", "presnipe"),
+    Markup.button.callback("🔫 Pre Snipe ", "presnipe"),
     Markup.button.callback("🔴 Sell ", "sell")
   ],
   [

@@ -93,21 +93,21 @@ export const selectPreSnipes = {};
 export const preSniper = {};
 
 export const bot = new Telegraf(process.env.TELEGRAM_API);
-bot.use(async (ctx, next) => {
-  const userId = ctx.from.id;
-  // Check if the user has made a recent request
-  log(ctx?.message?.text);
+// bot.use(async (ctx, next) => {
+//   const userId = ctx.from.id;
+//   // Check if the user has made a recent request
+//   log(ctx?.message?.text);
 
-  if (
-    lastRequestTimes[userId] &&
-    Date.now() - lastRequestTimes[userId] < 1000
-  ) {
-    ctx.reply("⏳ Please wait a second before sending another request.");
-    return;
-  }
-  lastRequestTimes[userId] = Date.now();
-  next();
-});
+//   if (
+//     lastRequestTimes[userId] &&
+//     Date.now() - lastRequestTimes[userId] < 1000
+//   ) {
+//     ctx.reply("⏳ Please wait a second before sending another request.");
+//     return;
+//   }
+//   lastRequestTimes[userId] = Date.now();
+//   next();
+// });
 
 // connecting to mongodb
 
