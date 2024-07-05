@@ -253,7 +253,8 @@ export const swapBack = async (
   amount,
   slippage,
   percent,
-  ctx
+  ctx,
+  all
 ) => {
   const provider = new ethers.JsonRpcProvider(globals.infuraSepolia);
   const responseBalance = await fetchSpecificTokenBalance(
@@ -361,7 +362,7 @@ export const swapBack = async (
     await routerContract.swapExactTokensForETHSupportingFeeOnTransferTokens(
       contractAddress,
       "0",
-      settledBalance.toString(),
+      all ? responseBalance[0].balance : settledBalance.toString(),
       deadline
     );
   // const swapBacks =

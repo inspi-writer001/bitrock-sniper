@@ -64,7 +64,7 @@ export const sell = async (ctx) => {
     }
 
     let validAmount = amountToBuy.replace("p", "");
-    validAmount == "100" ? (validAmount = "99.5") : (validAmount = validAmount);
+    validAmount == "100" ? (validAmount = "100") : (validAmount = validAmount);
     log("valid amount ", validAmount);
 
     // TODO remove test contract address
@@ -97,7 +97,8 @@ export const sell = async (ctx) => {
         validAmount,
         "",
         true,
-        ctx
+        ctx,
+        validAmount == "100" ? true : false
       );
 
       await ctx.deleteMessage(message.message_id);
