@@ -5,7 +5,8 @@ import {
   buyMessage,
   buyOptions,
   sellOptions,
-  snipeOptions
+  snipeOptions,
+  truncateText
 } from "../utils/keyboards.js";
 import { buyAddress, pnlState, preSniper, sellAddress } from "../index.js";
 import { findUser } from "../database/users.js";
@@ -13,7 +14,7 @@ import { dextoolsAudit, fetchSpecificTokenBalance } from "./moralis/moralis.js";
 import { fromCustomLamport } from "../utils/converters.js";
 import { getAverageGasLimit } from "./ethers/blockDetails.js";
 import { fetchETH } from "./fetchBalance.js";
-import { EthPrice } from "../utils/prices.js";
+import { EthPrice, tokenVariantPrice } from "../utils/prices.js";
 import { fetchHoneypot } from "./fetchHoneypot.js";
 
 dotenv.config();
@@ -85,13 +86,21 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
         };
 
         const message = buyMessage(response, body, poolData);
+        const tokenDetailEquivalence = await tokenVariantPrice(
+          body.balance,
+          contractAddress
+        );
         const option = buyOptions(
           contractAddress,
           user.defaultAddress,
           user.walletAddress,
           userBalance,
           balanceWorth,
-          user.slippage ? user.slippage : "default"
+          user.slippage ? user.slippage : "default",
+          body.balance,
+          tokenDetailEquivalence.brockBalance,
+          tokenDetailEquivalence.usdBalance,
+          truncateText(response.data.data.attributes.symbol, 5)
         );
         const sellOption = sellOptions(
           contractAddress,

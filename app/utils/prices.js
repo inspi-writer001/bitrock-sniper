@@ -49,6 +49,34 @@ export const EthPrice = async (balance) => {
   return userBalance;
 };
 
+export const tokenVariantPrice = async (tokenBalance, contractAddress) => {
+  const tokenPricee = await tokenPrice(contractAddress);
+
+  const usdBalance = Number(tokenPricee * Number(tokenBalance)).toFixed(2);
+
+  let brockAddress = "0x413f0E3A440abA7A15137F4278121450416882d5";
+  const response = await axios.get(
+    `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/tokens/${brockAddress}`,
+    {
+      headers: {
+        "x-cg-pro-api-key": env.COINGECKO_API_KEY
+      }
+    }
+  );
+
+  const brockPrice = Number(response.data.data.attributes.price_usd);
+
+  const brockBalance = Number(usdBalance / brockPrice).toFixed(2);
+
+  return {
+    usdBalance,
+    brockBalance
+  };
+
+  // formula
+  // token balance
+};
+
 export const EthPriceRaw = async (balance) => {
   if (Number(balance) <= 0) return 0;
   const response = await axios.get(

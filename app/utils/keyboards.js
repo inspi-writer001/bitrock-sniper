@@ -210,7 +210,11 @@ export const buyOptions = (
   walletAddress,
   balanceBrock,
   balanceUSD,
-  slippage
+  slippage,
+  tokenBalance,
+  brockBalance,
+  usdBalance,
+  tokenName
 ) =>
   Markup.inlineKeyboard([
     [
@@ -220,6 +224,13 @@ export const buyOptions = (
           4
         )} ✅ - Balance ${balanceBrock} $BROCK - ${balanceUSD}$`,
         "nothing"
+      )
+    ],
+    [Markup.button.callback(` --- CA Balance --- `, "nothinng")],
+    [
+      Markup.button.callback(
+        ` Contract Balance > ${tokenBalance} $${tokenName} > ${brockBalance} $BROCK > $${usdBalance}`,
+        "nothinnng"
       )
     ],
     [Markup.button.callback(` --- Your Actions --- `, "nothing")],
@@ -263,7 +274,11 @@ export const sellOptions = (
   walletIndex,
   walletAddress,
   balanceBrock,
-  balanceUSD
+  balanceUSD,
+  tokenBalance,
+  brockBalance,
+  usdBalance,
+  tokenName
 ) =>
   Markup.inlineKeyboard([
     [
@@ -273,6 +288,13 @@ export const sellOptions = (
           4
         )} ✅ - Balance ${balanceBrock} $BROCK - ${balanceUSD}$`,
         "nothing"
+      )
+    ],
+    [Markup.button.callback(` --- CA Balance --- `, "nothinng")],
+    [
+      Markup.button.callback(
+        ` Contract Balance > ${tokenBalance} $${tokenName} > ${brockBalance} $BROCK > $${usdBalance}`,
+        "nothinnng"
       )
     ],
     [Markup.button.callback(` --- Your Actions --- `, "nothing")],
