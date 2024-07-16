@@ -72,9 +72,6 @@ export const tokenVariantPrice = async (tokenBalance, contractAddress) => {
     usdBalance,
     brockBalance
   };
-
-  // formula
-  // token balance
 };
 
 export const EthPriceRaw = async (balance) => {

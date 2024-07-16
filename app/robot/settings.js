@@ -1,6 +1,14 @@
-import { fetchTokenBalances } from "../controllers/moralis/moralis.js";
+import {
+  dextoolsAudit,
+  fetchSpecificTokenBalance,
+  fetchTokenBalances
+} from "../controllers/moralis/moralis.js";
 import { Markup } from "telegraf";
+import axios from "axios";
+import dotenv from "dotenv";
+dotenv.config();
 
+const env = process.env;
 import {
   clearMaxLiq,
   clearMaxSellTax,
@@ -21,17 +29,19 @@ import { findUser } from "../database/users.js";
 import { fromCustomLamport } from "../utils/converters.js";
 import { err, log } from "../utils/globals.js";
 import {
+  buyMessage,
   buyOptions,
   buySettings,
   fastFastClose,
   removeFromPreSnipeList,
   sellOptions,
   sellSettings,
-  settingsInlineKeyboard
+  settingsInlineKeyboard,
+  truncateText
 } from "../utils/keyboards.js";
 import { buyAddress, preSniper, selectToken, state } from "../index.js";
 import { fetchETH } from "../controllers/fetchBalance.js";
-import { EthPrice } from "../utils/prices.js";
+import { EthPrice, tokenVariantPrice } from "../utils/prices.js";
 
 export const settingsHandler = async (ctx) => {
   let username = ctx.from.id.toString();
@@ -156,17 +166,99 @@ export const switchToSell = async (ctx) => {
   try {
     let username = ctx.from.id.toString();
     const user = await findUser(username);
+    const userAddress = user.walletAddress;
+
     const userBalance = await fetchETH(user.walletAddress);
     const balanceWorth = await EthPrice(userBalance);
     const contractAddress = buyAddress[username].attributes.address;
-    const sellOption = sellOptions(
-      contractAddress,
-      user.defaultAddress,
-      user.walletAddress,
-      userBalance,
-      balanceWorth
+
+    const tokenBalance = await fetchSpecificTokenBalance(
+      userAddress,
+      contractAddress
     );
-    await ctx.editMessageReplyMarkup(sellOption.reply_markup);
+
+    let formattedBalance = fromCustomLamport(
+      tokenBalance[0]?.balance || 0,
+      tokenBalance[0]?.decimals || 0
+    );
+
+    await axios
+      .get(
+        `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/tokens/${contractAddress}`,
+        {
+          headers: {
+            "x-cg-pro-api-key": env.COINGECKO_API_KEY
+          }
+        }
+      )
+      .then(async (response) => {
+        log("===== response from geckoterminal ====");
+        let poolData = "";
+        if (response.data.data.relationships.top_pools.data.length > 0) {
+          const pool = await axios.get(
+            `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/pools/${
+              response.data.data.relationships.top_pools.data[0].id.split(
+                "bitrock_"
+              )[1]
+            }`,
+            {
+              headers: {
+                "x-cg-pro-api-key": env.COINGECKO_API_KEY
+              }
+            }
+          );
+          poolData = pool.data.data;
+        }
+
+        const dextools = await dextoolsAudit(contractAddress);
+
+        //   log(response);
+        const body = {
+          balance: Number(formattedBalance).toFixed(3) || 0,
+          buyTax: dextools.buyTax,
+          sellTax: dextools.sellTax
+        };
+
+        const message = buyMessage(response, body, poolData);
+        const tokenDetailEquivalence = await tokenVariantPrice(
+          body.balance,
+          contractAddress
+        );
+        // const option = buyOptions(
+        //   contractAddress,
+        //   user.defaultAddress,
+        //   user.walletAddress,
+        //   userBalance,
+        //   balanceWorth,
+        //   user.slippage ? user.slippage : "default",
+        //   body.balance,
+        //   tokenDetailEquivalence.brockBalance,
+        //   tokenDetailEquivalence.usdBalance,
+        //   truncateText(response.data.data.attributes.symbol, 5)
+        // );
+        const sellOption = sellOptions(
+          contractAddress,
+          user.defaultAddress,
+          user.walletAddress,
+          userBalance,
+          balanceWorth,
+          body.balance,
+          tokenDetailEquivalence.brockBalance,
+          tokenDetailEquivalence.usdBalance,
+          truncateText(response.data.data.attributes.symbol, 5)
+        );
+        await ctx.editMessageReplyMarkup(sellOption.reply_markup);
+        // await ctx.editMessageReplyMarkup(buyOption.reply_markup);
+      });
+
+    // const sellOption = sellOptions(
+    //   contractAddress,
+    //   user.defaultAddress,
+    //   user.walletAddress,
+    //   userBalance,
+    //   balanceWorth
+    // );
+    // await ctx.editMessageReplyMarkup(sellOption.reply_markup);
   } catch (error) {
     log("==== error from switchToSell ====");
     err(error);
@@ -177,18 +269,98 @@ export const switchToBuy = async (ctx) => {
   try {
     let username = ctx.from.id.toString();
     const user = await findUser(username);
+    const userAddress = user.walletAddress;
+
     const userBalance = await fetchETH(user.walletAddress);
     const balanceWorth = await EthPrice(userBalance);
     const contractAddress = buyAddress[username].attributes.address;
-    const buyOption = buyOptions(
-      contractAddress,
-      user.defaultAddress,
-      user.walletAddress,
-      userBalance,
-      balanceWorth,
-      user.slippage ? user.slippage : "default"
+
+    const tokenBalance = await fetchSpecificTokenBalance(
+      userAddress,
+      contractAddress
     );
-    await ctx.editMessageReplyMarkup(buyOption.reply_markup);
+
+    let formattedBalance = fromCustomLamport(
+      tokenBalance[0]?.balance || 0,
+      tokenBalance[0]?.decimals || 0
+    );
+
+    await axios
+      .get(
+        `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/tokens/${contractAddress}`,
+        {
+          headers: {
+            "x-cg-pro-api-key": env.COINGECKO_API_KEY
+          }
+        }
+      )
+      .then(async (response) => {
+        log("===== response from geckoterminal ====");
+        let poolData = "";
+        if (response.data.data.relationships.top_pools.data.length > 0) {
+          const pool = await axios.get(
+            `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/pools/${
+              response.data.data.relationships.top_pools.data[0].id.split(
+                "bitrock_"
+              )[1]
+            }`,
+            {
+              headers: {
+                "x-cg-pro-api-key": env.COINGECKO_API_KEY
+              }
+            }
+          );
+          poolData = pool.data.data;
+        }
+
+        const dextools = await dextoolsAudit(contractAddress);
+
+        //   log(response);
+        const body = {
+          balance: Number(formattedBalance).toFixed(3) || 0,
+          buyTax: dextools.buyTax,
+          sellTax: dextools.sellTax
+        };
+
+        const message = buyMessage(response, body, poolData);
+        const tokenDetailEquivalence = await tokenVariantPrice(
+          body.balance,
+          contractAddress
+        );
+        const buyOption = buyOptions(
+          contractAddress,
+          user.defaultAddress,
+          user.walletAddress,
+          userBalance,
+          balanceWorth,
+          user.slippage ? user.slippage : "default",
+          body.balance,
+          tokenDetailEquivalence.brockBalance,
+          tokenDetailEquivalence.usdBalance,
+          truncateText(response.data.data.attributes.symbol, 5)
+        );
+        // const sellOption = sellOptions(
+        //   contractAddress,
+        //   user.defaultAddress,
+        //   user.walletAddress,
+        //   userBalance,
+        //   balanceWorth,
+        //   body.balance,
+        //   tokenDetailEquivalence.brockBalance,
+        //   tokenDetailEquivalence.usdBalance,
+        //   truncateText(response.data.data.attributes.symbol, 5)
+        // );
+
+        await ctx.editMessageReplyMarkup(buyOption.reply_markup);
+      });
+    // const buyOption = buyOptions(
+    //   contractAddress,
+    //   user.defaultAddress,
+    //   user.walletAddress,
+    //   userBalance,
+    //   balanceWorth,
+    //   user.slippage ? user.slippage : "default"
+    // );
   } catch (error) {
     log("==== error from switchToBuy ====");
     err(error);

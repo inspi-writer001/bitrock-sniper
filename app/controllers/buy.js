@@ -107,7 +107,11 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
           user.defaultAddress,
           user.walletAddress,
           userBalance,
-          balanceWorth
+          balanceWorth,
+          body.balance,
+          tokenDetailEquivalence.brockBalance,
+          tokenDetailEquivalence.usdBalance,
+          truncateText(response.data.data.attributes.symbol, 5)
         );
 
         // keyboard
