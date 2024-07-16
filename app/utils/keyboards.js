@@ -297,6 +297,7 @@ export const sellOptions = (
         "nothinnng"
       )
     ],
+    [Markup.button.callback("🔄 Reload ", "switchToSell")],
     [Markup.button.callback(` --- Your Actions --- `, "nothing")],
     [
       Markup.button.callback("⚡️ Sell 10% ", "10p"),
