@@ -67,7 +67,7 @@ export const settingsInlineKeyboard = async (telegramId) => {
   return Markup.inlineKeyboard([
     [
       Markup.button.callback(" Export Wallet ", "exportW"),
-      Markup.button.callback(" 👑 Go Premium ", "premiumF")
+      Markup.button.callback(" 👑 $APE Holder ", "premiumF")
     ],
     // [
     //   Markup.button.callback(" Fast 🦄 ", "button8"),
