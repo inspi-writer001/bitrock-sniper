@@ -1,5 +1,7 @@
 import { fetchETH } from "../controllers/fetchBalance.js";
 import { fetchUser } from "../controllers/fetchWallets.js";
+import { findUser } from "../database/users.js";
+import { log } from "../utils/globals.js";
 import {
   fastKeyboard,
   inlineKeyboard,
@@ -14,15 +16,14 @@ export const startHandler = async (ctx) => {
     console.log("========== start =============");
 
     const response = await fetchUser(username);
-    const balances = await Promise.all([
-      fetchETH(response.wallets[0].address),
-      fetchETH(response.wallets[1].address)
-    ]);
+    const user = await findUser(username);
+    const walletAddresses = user.wallets.map((wallet) => wallet.address);
 
-    const prices = await Promise.all([
-      EthPrice(balances[0]),
-      EthPrice(balances[1])
-    ]);
+    const balances = await Promise.all(walletAddresses.map(fetchETH));
+    const prices = await Promise.all(balances.map(EthPrice));
+
+    // log(balances);
+    // log(user.wallets);
 
     const welcome =
       `<b> 🚀 Elite Sniper Bot - Official Sniper Bot on the Bitrock Blockchain 🎯</b>\n\n` +
@@ -36,7 +37,7 @@ export const startHandler = async (ctx) => {
       `If you need any help, just type /help.\n\n` +
       `Here are your $BROCK Trading wallets. Select your default wallet and dive into trading🎯\n\n` +
       `<code>═══ Your Wallets ═══</code>\n` +
-      response.wallets
+      user.wallets
         .map((e, i) => {
           return `<b>▰ Address ${i + 1}: ▰</b>\nBal: ${balances[i]} BROCK $${
             prices[i]

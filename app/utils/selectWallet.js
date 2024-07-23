@@ -1,36 +1,42 @@
 import { Markup } from "telegraf";
-import { changeDefaultWallet } from "../database/users.js";
-import { fetchUser } from "../controllers/fetchWallets.js";
+import { changeDefaultWallet, findUser } from "../database/users.js";
 import { encrypt } from "../controllers/encryption.js";
+import { err, log } from "./globals.js";
+import { fetchDefaultWallet } from "../robot/settings.js";
 
 // user personal inline keyboard
-const inlineKeyboard = Markup.inlineKeyboard([
-  [Markup.button.callback(" SELECT DEFAULT WALLET ", "selectWallet")],
-  [
-    Markup.button.callback(" w1 ", "selectWallet:w1"),
-    Markup.button.callback(" w2 ", "selectWallet:w2")
-    // Markup.button.callback(" w3 ", "selectWallet:w3")
-  ],
-  [
-    Markup.button.callback("🟢 Buy ", "buy"),
-    Markup.button.callback("🔫 Pre Snipe ", "presnipe"),
-    Markup.button.callback("🔴 Sell ", "sell")
-  ],
-  [
-    // Markup.button.callback(" New Pairs ", "newPairs"),
-    Markup.button.callback("Active Snipes ", "openPositions"),
-    Markup.button.callback("⚙️ Settings ", "settings")
-  ],
-  // [Markup.button.callback(" 🔑 Mnemonics ", "button8")],
+const inlineKeyboard = async (telegramId) => {
+  const [wallets, userDefaultWallet] = await Promise.all([
+    findUser(telegramId),
+    fetchDefaultWallet(telegramId)
+  ]);
 
-  [
-    Markup.button.webApp(" Help ", "https://apetoken.net")
-    // Markup.button.callback("💰 View Settings ", "button7")
-  ]
-]);
+  const walletButtons = wallets.wallets.map((wallet, index) =>
+    Markup.button.callback(
+      `${userDefaultWallet == index ? "✅" : ""} w${index + 1} `,
+      `selectWallet:w${index + 1}`
+    )
+  );
 
-const updateWalletButtons = (selectedWallet) => {
-  inlineKeyboard.reply_markup.inline_keyboard.forEach((row) => {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback(" SELECT DEFAULT WALLET ", "selectWallet")],
+    walletButtons, // Convert to 2D array for proper formatting
+    [
+      Markup.button.callback("🟢 Buy ", "buy"),
+      Markup.button.callback("🔫 Pre Snipe ", "presnipe"),
+      Markup.button.callback("🔴 Sell ", "sell")
+    ],
+    [
+      Markup.button.callback("Active Snipes ", "openPositions"),
+      Markup.button.callback("⚙️ Settings ", "settings")
+    ],
+    [Markup.button.webApp(" Help ", "https://apetoken.net")]
+  ]);
+};
+
+const updateWalletButtons = async (selectedWallet, username) => {
+  const keyboard = await inlineKeyboard(username);
+  keyboard.reply_markup.inline_keyboard.forEach((row) => {
     row.forEach((button) => {
       if (
         button.callback_data &&
@@ -46,55 +52,32 @@ const updateWalletButtons = (selectedWallet) => {
       }
     });
   });
+  return keyboard;
 };
 
-export const selectWallet1 = async (ctx) => {
+const selectWallet = async (ctx, walletIndex) => {
   try {
-    let username = ctx.from.id.toString();
-    updateWalletButtons("w1");
-    const userUnityWallet = (await fetchUser(username)).wallets;
+    const username = ctx.from.id.toString();
+    const userUnityWallet = (await findUser(username)).wallets;
     await changeDefaultWallet(
       username,
-      0,
-      encrypt(userUnityWallet[0].privateKey),
-      userUnityWallet[0].address
+      walletIndex,
+      userUnityWallet[walletIndex].privateKey,
+      userUnityWallet[walletIndex].address
     );
-    await ctx.editMessageReplyMarkup(inlineKeyboard.reply_markup);
+    const updatedKeyboard = await updateWalletButtons(
+      `w${walletIndex + 1}`,
+      username
+    );
+    await ctx.editMessageReplyMarkup(updatedKeyboard.reply_markup);
   } catch (error) {
     console.log("--- trying to update current wallet ----");
+    err(error);
   }
 };
 
-export const selectWallet2 = async (ctx) => {
-  try {
-    let username = ctx.from.id.toString();
-    updateWalletButtons("w2");
-    const userUnityWallet = (await fetchUser(username)).wallets;
-    await changeDefaultWallet(
-      username,
-      1,
-      encrypt(userUnityWallet[1].privateKey),
-      userUnityWallet[1].address
-    );
-    await ctx.editMessageReplyMarkup(inlineKeyboard.reply_markup);
-  } catch (error) {
-    console.log("--- trying to update current wallet ----");
-  }
-};
-
-export const selectWallet3 = async (ctx) => {
-  try {
-    let username = ctx.from.id.toString();
-    updateWalletButtons("w3");
-    const userUnityWallet = (await fetchUser(username)).wallets;
-    await changeDefaultWallet(
-      username,
-      2,
-      encrypt(userUnityWallet[2].privateKey),
-      userUnityWallet[2].address
-    );
-    await ctx.editMessageReplyMarkup(inlineKeyboard.reply_markup);
-  } catch (error) {
-    console.log("--- trying to update current wallet ----");
-  }
-};
+export const selectWallet1 = async (ctx) => selectWallet(ctx, 0);
+export const selectWallet2 = async (ctx) => selectWallet(ctx, 1);
+export const selectWallet3 = async (ctx) => selectWallet(ctx, 2);
+export const selectWallet4 = async (ctx) => selectWallet(ctx, 3);
+export const selectWallet5 = async (ctx) => selectWallet(ctx, 4);

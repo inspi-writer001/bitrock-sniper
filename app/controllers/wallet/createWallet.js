@@ -81,3 +81,32 @@ export const exportWallet = async (ctx) => {
     err(error);
   }
 };
+
+export const createThree = async () => {
+  const wallet1 = ethers.Wallet.createRandom();
+  //   const seedPhrase = wallet1.mnemonic.phrase;
+  const privateKey1 = wallet1.privateKey;
+  const wallet2 = ethers.Wallet.createRandom();
+  //   const seedPhrase = wallet1.mnemonic.phrase;
+  const privateKey2 = wallet2.privateKey;
+  const wallet3 = ethers.Wallet.createRandom();
+  //   const seedPhrase = wallet1.mnemonic.phrase;
+  const privateKey3 = wallet3.privateKey;
+
+  const address1 = wallet1.address;
+  const address2 = wallet2.address;
+  const address3 = wallet3.address;
+
+  const wallets = [
+    {
+      address: address1,
+      privateKey: encrypt(privateKey1)
+    },
+    {
+      address: address2,
+      privateKey: encrypt(privateKey2)
+    },
+    { address: address3, privateKey: encrypt(privateKey3) }
+  ];
+  return wallets;
+};

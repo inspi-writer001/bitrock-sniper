@@ -21,6 +21,7 @@ import { txError } from "../errors/txError.js";
 import {
   bot,
   buySettingsState,
+  premiumSettingsState,
   preSniper,
   selectPreSnipes,
   selectToken,
@@ -41,6 +42,7 @@ import {
   removeSnipeFromList
 } from "../database/preSnipe.js";
 import { fetchTokenDetails } from "../controllers/moralis/moralis.js";
+import { verifyPremiumCode } from "../database/premium.js";
 
 // bot.action("editMinMCap", async (ctx) => {
 //   log("hit");
@@ -139,6 +141,11 @@ export const pendingSettings = async () => {
         log("========== from pendingSettings ==========");
         err("========= is not a number ==========");
         await ctx.replyWithHTML(`<i> enter a valid number </i>`);
+      }
+
+      if (premiumSettingsState[username]) {
+        await verifyPremiumCode(text, username, ctx);
+        delete premiumSettingsState[username];
       }
 
       isWalletValid(text) &&

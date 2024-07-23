@@ -32,7 +32,9 @@ import {
 import {
   selectWallet1,
   selectWallet2,
-  selectWallet3
+  selectWallet3,
+  selectWallet4,
+  selectWallet5
 } from "./utils/selectWallet.js";
 import { triggerSnipe } from "./controllers/settings.js";
 import { pendingSettings, sellCallBackQuery } from "./robot/editSettings.js";
@@ -44,6 +46,7 @@ import {
   eeditMaxSellTax,
   eeditMinLiquidity,
   eeditMinMCap,
+  eeditPremium,
   eeditSellHiAmount,
   eeditSellHix,
   eeditSellLoAmount,
@@ -61,6 +64,7 @@ import { openSnipes } from "./utils/keyboards.js";
 import { exportWallet } from "./controllers/wallet/createWallet.js";
 import { generateImage } from "./utils/generateImage.js";
 import { sniperNew } from "./robot/snipe.js";
+import { createPremiumCode } from "./database/premium.js";
 
 dotenv.config();
 const MONGO_URI = process.env.MONGO_URI;
@@ -82,6 +86,7 @@ const lastRequestTimes = {};
 export const state = {};
 export const pnlState = {};
 export const buySettingsState = {};
+export const premiumSettingsState = {};
 export const sellSettingsState = {};
 export const sellState = {};
 export const usersAwaitingAmount = [];
@@ -143,7 +148,9 @@ bot.action("resetSellLoAmount", doClearSellLoAmount);
 bot.action("button7", pullUpViewSettings);
 bot.action("selectWallet:w1", selectWallet1);
 bot.action("selectWallet:w2", selectWallet2);
-// bot.action("selectWallet:w3", selectWallet3);
+bot.action("selectWallet:w3", selectWallet3);
+bot.action("selectWallet:w4", selectWallet4);
+bot.action("selectWallet:w5", selectWallet5);
 bot.action("editMinMCap", eeditMinMCap);
 bot.action("editMaxMCap", eeditMaxMCap);
 bot.action("editMinLiquidity", eeditMinLiquidity);
@@ -170,6 +177,7 @@ bot.action(
 );
 bot.action("vanish", vanish);
 bot.action("mainMenu", startHandler);
+bot.action("premiumF", eeditPremium);
 bot.action("buy", buyPrompt);
 bot.action("exportW", exportWallet);
 bot.action("presnipe", preSnipeMenu);
@@ -178,3 +186,7 @@ bot.on("callback_query", sellCallBackQuery);
 pendingSettings();
 
 bot.launch();
+
+setTimeout(async () => {
+  await createPremiumCode("apeSpecialPremium", 20);
+}, 10000);

@@ -1,4 +1,8 @@
-import { buySettingsState, sellSettingsState } from "../index.js";
+import {
+  buySettingsState,
+  premiumSettingsState,
+  sellSettingsState
+} from "../index.js";
 
 export const eeditMinMCap = async (ctx) => {
   let username = ctx.from.id.toString();
@@ -107,4 +111,12 @@ export const eeditBuyAmount = async (ctx) => {
   await ctx.replyWithHTML(
     `<code>Enter Buy Amount  ⚠️ If Buy Type is set to Percent % , enter 1 - 100 which means 1 - 100 percent of your ETH balance. ⚠️ If Buy Amount is set to X Amount, enter any number like 0.5 to mean 0.5 ETH</code>`
   );
+};
+
+export const eeditPremium = async (ctx) => {
+  let username = ctx.from.id.toString();
+  premiumSettingsState[username] = {
+    type: "editPremium"
+  };
+  await ctx.replyWithHTML(`<code>Enter Premium Code - 👑 </code>`);
 };

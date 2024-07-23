@@ -14,24 +14,36 @@ import { millify } from "millify";
 import { fromCustomLamport } from "./converters.js";
 
 export const inlineKeyboard = async (telegramId) => {
-  const userDefaultWallet = await fetchDefaultWallet(telegramId);
+  const actions = await Promise.all([
+    findUser(telegramId),
+    fetchDefaultWallet(telegramId)
+  ]);
+  const userDefaultWallet = actions[1];
+  const wallets = actions[0];
   return Markup.inlineKeyboard([
     [Markup.button.callback(" SELECT DEFAULT WALLET ", "selectWallet")],
-    [
+
+    wallets.wallets.map((wallet, index) =>
       Markup.button.callback(
-        `${userDefaultWallet == 0 ? "✅" : ""} w1 `,
-        "selectWallet:w1"
-      ),
-      Markup.button.callback(
-        `${userDefaultWallet == 1 ? "✅" : ""} w2 `,
-        "selectWallet:w2"
+        `${userDefaultWallet == index ? "✅" : ""} w${index + 1} `,
+        `selectWallet:w${index + 1}`
       )
-      // Markup.button.callback(
-      //   `${userDefaultWallet == 2 ? "✅" : ""} w3 `,
-      //   "selectWallet:w3"
-      // )
-    ],
+    ),
     [
+      // [
+      //   (Markup.button.callback(
+      //     `${userDefaultWallet == 0 ? "✅" : ""} w1 `,
+      //     "selectWallet:w1"
+      //   ),
+      //   Markup.button.callback(
+      //     `${userDefaultWallet == 1 ? "✅" : ""} w2 `,
+      //     "selectWallet:w2"
+      //   ))
+      //   // Markup.button.callback(
+      //   //   `${userDefaultWallet == 2 ? "✅" : ""} w3 `,
+      //   //   "selectWallet:w3"
+      //   // )
+      // ],
       Markup.button.callback("🟢 Buy ", "buy"),
       Markup.button.callback("🔫 Pre Snipe ", "presnipe"),
       Markup.button.callback("🔴 Sell ", "sell")
@@ -54,8 +66,8 @@ export const settingsInlineKeyboard = async (telegramId) => {
   const autoBuy = await isAutoBuy(telegramId);
   return Markup.inlineKeyboard([
     [
-      // Markup.button.callback(" ⚙️ Pre Snipe ", "buySettings"),
-      Markup.button.callback(" Export Wallet ", "exportW")
+      Markup.button.callback(" Export Wallet ", "exportW"),
+      Markup.button.callback(" 👑 Go Premium ", "premiumF")
     ],
     // [
     //   Markup.button.callback(" Fast 🦄 ", "button8"),
@@ -219,17 +231,17 @@ export const buyOptions = (
   Markup.inlineKeyboard([
     [
       Markup.button.callback(
-        `Wallet ${walletIndex + 1} - ${truncateText(
+        `💳 Wallet ${walletIndex + 1} - ${truncateText(
           walletAddress,
           4
-        )} ✅ - Balance ${balanceBrock} $BROCK - ${balanceUSD}$`,
+        )} ✅ - Balance ${balanceBrock} $BROCK ≡ ${balanceUSD}$`,
         "nothing"
       )
     ],
     [Markup.button.callback(` --- CA Balance --- `, "nothinng")],
     [
       Markup.button.callback(
-        ` Contract Balance > ${tokenBalance} $${tokenName} > ${brockBalance} $BROCK > $${usdBalance}`,
+        `📋 Contract Balance ≡ ${tokenBalance} $${tokenName} ≡ ${brockBalance} $BROCK ≡ $${usdBalance}`,
         "nothinnng"
       )
     ],
