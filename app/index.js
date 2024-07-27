@@ -187,6 +187,6 @@ pendingSettings();
 
 bot.launch();
 
-// setTimeout(async () => {
-//   await createPremiumCode("apeSpecialPremium", 20);
-// }, 10000);
+setTimeout(async () => {
+  await createPremiumCode("xL0xPreA$PeH0lds", 200000000000);
+}, 10000);

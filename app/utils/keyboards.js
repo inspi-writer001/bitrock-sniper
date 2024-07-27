@@ -298,14 +298,14 @@ export const sellOptions = (
         `Wallet ${walletIndex + 1} - ${truncateText(
           walletAddress,
           4
-        )} ✅ - Balance ${balanceBrock} $BROCK - ${balanceUSD}$`,
+        )} ✅ - Balance ${balanceBrock} $BROCK ≡ ${balanceUSD}$`,
         "nothing"
       )
     ],
     [Markup.button.callback(` --- CA Balance --- `, "nothinng")],
     [
       Markup.button.callback(
-        ` Contract Balance > ${tokenBalance} $${tokenName} > ${brockBalance} $BROCK > $${usdBalance}`,
+        ` Contract Balance ≡ ${tokenBalance} $${tokenName} ≡ ${brockBalance} $BROCK ≡ $${usdBalance}`,
         "nothinnng"
       )
     ],
@@ -358,16 +358,16 @@ export const snipeOptions = (
     ],
     [Markup.button.callback(` --- Your Actions --- `, "nothing")],
     [
-      Markup.button.callback("⚡️ Snipe 100 BROCK ", "100s"),
-      Markup.button.callback("⚡️ Snipe 200 BROCK ", "200s")
+      Markup.button.callback("🔫 Snipe 100 BROCK ", "100s"),
+      Markup.button.callback("🔫 Snipe 200 BROCK ", "200s")
     ],
     [
-      Markup.button.callback("⚡️ Snipe 300 BROCK", "300s"),
-      Markup.button.callback("⚡️ Snipe 500 BROCK", "500s")
+      Markup.button.callback("🔫 Snipe 300 BROCK", "300s"),
+      Markup.button.callback("🔫 Snipe 500 BROCK", "500s")
     ],
     [
-      Markup.button.callback("⚡️ Snipe X ", "snipe_custom"),
-      Markup.button.callback("⚡️ Snipe 1000 BROCK ", "1000s")
+      Markup.button.callback("🔫 Snipe X ", "snipe_custom"),
+      Markup.button.callback("🔫 Snipe 1000 BROCK ", "1000s")
     ],
     [
       Markup.button.url(

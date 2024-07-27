@@ -4,6 +4,7 @@ import { decrypt, encrypt } from "../encryption.js";
 import { fetchUser } from "../fetchWallets.js";
 import { err, log } from "../../utils/globals.js";
 import { fastFastClose, fastKeyboard } from "../../utils/keyboards.js";
+import { findUser } from "../../database/users.js";
 
 export const createWallet12 = async (telegramId) => {
   const existingUser = await User.findOne({
@@ -56,7 +57,7 @@ export const firstTimeCreate12 = async () => {
 export const exportWallet = async (ctx) => {
   try {
     let username = ctx.from.id.toString();
-    const user = await fetchUser(username);
+    const user = await findUser(username);
     const userWallets = user.wallets;
     // log(" userrrr", user.wallets[0]);
     const key =
@@ -70,7 +71,7 @@ export const exportWallet = async (ctx) => {
             "wallet" +
             (i + 1) +
             " " +
-            `<span class="tg-spoiler">${e.privateKey}</span>\n\n`
+            `<span class="tg-spoiler">${decrypt(e.privateKey)}</span>\n\n`
           );
         })
         .toString()
