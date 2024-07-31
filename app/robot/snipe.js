@@ -40,7 +40,8 @@ export const sniperNew = async (ctx) => {
         ctx,
         amountToBuy == "snipe_max" ? "max_transaction" : validAmount,
         currentUser.encrypted_mnemonnics,
-        currentUser.walletAddress
+        currentUser.walletAddress,
+        preSniper[username].trade.decimals
       );
     } catch (error) {
       log(error);

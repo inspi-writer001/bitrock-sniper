@@ -176,7 +176,8 @@ export const pendingSettings = async () => {
               ctx,
               customValue,
               currentUser.encrypted_mnemonnics,
-              currentUser.walletAddress
+              currentUser.walletAddress,
+              preSniper[username].trade.decimals
             );
           } catch (error) {
             log("====== error from custom snipe ======");

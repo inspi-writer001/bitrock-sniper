@@ -133,7 +133,8 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
                 trade: {
                   userAddress: user.walletAddress,
                   contractAddress: contractAddress,
-                  encrypted_mnemonics: user.encrypted_mnemonnics
+                  encrypted_mnemonics: user.encrypted_mnemonnics,
+                  decimals: response.data.data.attributes.decimals
                 }
               };
             })()

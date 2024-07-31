@@ -10,7 +10,8 @@ export const preSnipeActionDB = async (
   ctx,
   amount,
   encrypted_mnemonnics,
-  walletAddress
+  walletAddress,
+  decimals
 ) => {
   const bulkPromise = await Promise.all([
     PreSnipes.find({ username: username }),
@@ -31,7 +32,8 @@ export const preSnipeActionDB = async (
       amount: amount,
       encrypted_mnemonnics: encrypted_mnemonnics,
       walletAddress,
-      walletIndex
+      walletIndex,
+      decimals
     });
     await existingUser[0].save();
     await closePreSnipeWithUsername(username);
@@ -48,7 +50,8 @@ export const preSnipeActionDB = async (
           amount: amount,
           encrypted_mnemonnics: encrypted_mnemonnics,
           walletAddress,
-          walletIndex
+          walletIndex,
+          decimals
         }
       ]
     });

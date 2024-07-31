@@ -424,7 +424,7 @@ export const preSnipeAction = async (bot) => {
                               snipe.encrypted_mnemonnics ||
                                 currentUser.encrypted_mnemonnics
                             ),
-                            "18",
+                            snipe.decimals || "18",
                             "",
                             "",
                             buyAmount.toString(),
