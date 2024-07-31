@@ -31,13 +31,14 @@ export const sniperNew = async (ctx) => {
 
       return;
     }
+
     let validAmount = amountToBuy.replace("s", "");
     try {
       await preSnipeActionDB(
         preSniper[username].trade.contractAddress,
         username,
         ctx,
-        validAmount,
+        amountToBuy == "snipe_max" ? "max_transaction" : validAmount,
         currentUser.encrypted_mnemonnics,
         currentUser.walletAddress
       );

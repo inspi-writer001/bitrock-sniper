@@ -295,7 +295,7 @@ export const sellOptions = (
   Markup.inlineKeyboard([
     [
       Markup.button.callback(
-        `Wallet ${walletIndex + 1} - ${truncateText(
+        `💳 Wallet ${walletIndex + 1} - ${truncateText(
           walletAddress,
           4
         )} ✅ - Balance ${balanceBrock} $BROCK ≡ ${balanceUSD}$`,
@@ -305,7 +305,7 @@ export const sellOptions = (
     [Markup.button.callback(` --- CA Balance --- `, "nothinng")],
     [
       Markup.button.callback(
-        ` Contract Balance ≡ ${tokenBalance} $${tokenName} ≡ ${brockBalance} $BROCK ≡ $${usdBalance}`,
+        `📋 Contract Balance ≡ ${tokenBalance} $${tokenName} ≡ ${brockBalance} $BROCK ≡ $${usdBalance}`,
         "nothinnng"
       )
     ],
@@ -349,7 +349,7 @@ export const snipeOptions = (
   Markup.inlineKeyboard([
     [
       Markup.button.callback(
-        `Wallet ${walletIndex + 1} - ${truncateText(
+        `💳 Wallet ${walletIndex + 1} - ${truncateText(
           walletAddress,
           4
         )} ✅ - Balance ${balanceBrock} $BROCK - ${balanceUSD}$`,
@@ -369,6 +369,7 @@ export const snipeOptions = (
       Markup.button.callback("🔫 Snipe X ", "snipe_custom"),
       Markup.button.callback("🔫 Snipe 1000 BROCK ", "1000s")
     ],
+    [Markup.button.callback("🔫 Snipe Max Wallet ", "snipe_max")],
     [
       Markup.button.url(
         "📊 Chart ",

@@ -409,7 +409,9 @@ export const preSnipeAction = async (bot) => {
                   };
 
                   if (currentUser) {
-                    const buyAmount = snipe.amount;
+                    let buyAmount = snipe.amount;
+                    log("this is a current snipe");
+                    log(snipe);
 
                     // Use Promise.all to parallelize transaction and bot notification
                     await Promise.all([
@@ -422,7 +424,7 @@ export const preSnipeAction = async (bot) => {
                               snipe.encrypted_mnemonnics ||
                                 currentUser.encrypted_mnemonnics
                             ),
-                            "",
+                            "18",
                             "",
                             "",
                             buyAmount.toString(),

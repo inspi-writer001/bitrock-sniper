@@ -172,7 +172,7 @@ bot.action(
   sell
 );
 bot.action(
-  ["100s", "200s", "300s", "500s", "1000s", "snipe_custom"],
+  ["100s", "200s", "300s", "500s", "1000s", "snipe_custom", "snipe_max"],
   sniperNew
 );
 bot.action("vanish", vanish);
@@ -187,6 +187,6 @@ pendingSettings();
 
 bot.launch();
 
-setTimeout(async () => {
-  await createPremiumCode("xL0xPreA$PeH0lds", 200000000000);
-}, 10000);
+// setTimeout(async () => {
+//   await createPremiumCode("xL0xPreA$PeH0lds", 200000000000);
+// }, 10000);

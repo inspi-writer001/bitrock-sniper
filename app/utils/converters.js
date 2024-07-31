@@ -10,6 +10,10 @@ export const toCustomLamport = (amount, decimals) => {
 export const fromCustomLamport = (amount, decimals) => {
   return amount / (1 * Math.pow(10, Number(decimals)));
 };
+
+export const fromCustomLamportEther = (amount, decimals) => {
+  return ethers.formatUnits(amount, decimals);
+};
 // export const toCustomLamport = (amount, decimals) => {
 //   return 1 * Math.pow(10, Number(decimals)) * amount;
 // };

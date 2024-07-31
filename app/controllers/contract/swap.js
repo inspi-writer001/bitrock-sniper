@@ -2,10 +2,15 @@ import { ethers } from "ethers";
 import { smartContractTestnetAddress } from "./contractAddress.js";
 import axios from "axios";
 import { err, globals, log } from "../../utils/globals.js";
-import { fromCustomLamport, toCustomLamport } from "../../utils/converters.js";
+import {
+  fromCustomLamport,
+  fromCustomLamportEther,
+  toCustomLamport
+} from "../../utils/converters.js";
 import { BN } from "bn.js";
 import { fetchSpecificTokenBalance } from "../moralis/moralis.js";
-import { EthPrice } from "../../utils/prices.js";
+import { EthPrice, tokenVariantPrice } from "../../utils/prices.js";
+import { COINTOOL_ABI } from "./cointoolAbi.js";
 
 // TODO change sepolia WETH to mainnet WETH
 const WETH = "0x413f0E3A440abA7A15137F4278121450416882d5";
@@ -146,6 +151,7 @@ export const useSniper = async (
 ) => {
   const provider = new ethers.JsonRpcProvider(globals.infuraSepolia);
   const walletInstance = new ethers.Wallet(privateKey, provider);
+  let storedAmount = amount;
   const routerContract = new ethers.Contract(
     smartContractTestnetAddress,
     [
@@ -163,23 +169,6 @@ export const useSniper = async (
     provider
   );
 
-  const structuredAmount = ethers
-    .parseEther(((95 / 100) * Number(amount)).toFixed(2).toString())
-    .toString();
-
-  log("==== amounts out =====");
-  const exactAmountsOut = await rockRouterContract.getAmountsOut(
-    structuredAmount,
-    [WETH, contractAddress]
-  );
-  log(exactAmountsOut);
-
-  let slippageAmount;
-  if (slippage) {
-    slippageAmount =
-      BigInt(exactAmountsOut[1]) -
-      (BigInt(exactAmountsOut[1]) * BigInt(slippage)) / BigInt(100);
-  }
   // const routerContract = new ethers.Contract(
   //   smartContractTestnetAddress,
   //   [
@@ -210,6 +199,51 @@ export const useSniper = async (
   }
 
   // const contractParams = ["0", [WETH, contractAddress], userAddress, deadline];
+
+  if (amount == "max_transaction") {
+    try {
+      let tokenContract = new ethers.Contract(
+        contractAddress,
+        COINTOOL_ABI,
+        provider
+      );
+
+      let maxTransactionAmount = await tokenContract.Max_Transaction_Amount();
+      log("===== max transaction amount =====");
+      log(maxTransactionAmount);
+      let getTokenEquivalence = await tokenVariantPrice(
+        fromCustomLamport(maxTransactionAmount.toString(), decimal),
+        contractAddress
+      );
+      amount = getTokenEquivalence.brockBalance;
+      // amount = maxTransactionAmount.toString();
+    } catch (error) {
+      log("error from max snipe for individual");
+      err(error);
+      throw new Error("Failed to snipe Max Transaction Amount");
+    }
+  }
+
+  log("here's what amount looks like ");
+  log(amount.toString());
+
+  let structuredAmount = ethers
+    .parseEther(((95 / 100) * Number(amount)).toFixed(2).toString())
+    .toString();
+
+  log("==== amounts out =====");
+  const exactAmountsOut = await rockRouterContract.getAmountsOut(
+    structuredAmount,
+    [WETH, contractAddress]
+  );
+  log(exactAmountsOut);
+
+  let slippageAmount;
+  if (slippage) {
+    slippageAmount =
+      BigInt(exactAmountsOut[1]) -
+      (BigInt(exactAmountsOut[1]) * BigInt(slippage)) / BigInt(100);
+  }
   const contractParams = [
     contractAddress,
     slippageAmount ? slippageAmount.toString() : "0",
