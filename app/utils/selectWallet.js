@@ -3,6 +3,8 @@ import { changeDefaultWallet, findUser } from "../database/users.js";
 import { encrypt } from "../controllers/encryption.js";
 import { err, log } from "./globals.js";
 import { fetchDefaultWallet } from "../robot/settings.js";
+import { createSingleWallet } from "../controllers/wallet/createWallet.js";
+import User from "../Schema/User.js";
 
 // user personal inline keyboard
 const inlineKeyboard = async (telegramId) => {
@@ -75,6 +77,54 @@ const selectWallet = async (ctx, walletIndex) => {
     err(error);
   }
 };
+
+const resetWallet = async (ctx, walletIndex) => {
+  try {
+    let actualIndex = Number(walletIndex);
+    const username = ctx.from.id.toString();
+    const user = await findUser(username);
+    let userWallets = user.wallets;
+
+    // recreate a wallet to override the previous one at index
+    const singleWallet = await createSingleWallet();
+
+    userWallets[actualIndex] = singleWallet;
+    let defaultAddress = user.defaultAddress;
+    let walletAddress = user.walletAddress;
+    let encrypted_mnemonnics = user.encrypted_mnemonnics;
+    // if the wallet is the default wallet, update the default wallet also ==
+    if (Number(walletIndex) == Number(user.defaultAddress)) {
+      defaultAddress = Number(walletIndex);
+      walletAddress = singleWallet.address;
+      encrypted_mnemonnics = singleWallet.privateKey;
+    }
+
+    await User.findOneAndUpdate(
+      { username },
+      {
+        wallets: userWallets,
+        defaultAddress: defaultAddress,
+        walletAddress: walletAddress,
+        encrypted_mnemonnics
+      }
+    );
+
+    await ctx.reply(
+      `🤝 Wallet ${
+        actualIndex + 1
+      } reset Successfully.\nDo not share your privatekey with anyone!`
+    );
+  } catch (error) {
+    console.log("--- trying to reset current wallet ---- %s ", walletIndex);
+    err(error);
+  }
+};
+
+export const resetWallet1 = async (ctx) => await resetWallet(ctx, 0);
+export const resetWallet2 = async (ctx) => await resetWallet(ctx, 1);
+export const resetWallet3 = async (ctx) => await resetWallet(ctx, 2);
+export const resetWallet4 = async (ctx) => await resetWallet(ctx, 3);
+export const resetWallet5 = async (ctx) => await resetWallet(ctx, 4);
 
 export const selectWallet1 = async (ctx) => selectWallet(ctx, 0);
 export const selectWallet2 = async (ctx) => selectWallet(ctx, 1);

@@ -25,6 +25,20 @@ export const createWallet12 = async (telegramId) => {
   return wallets;
 };
 
+export const createSingleWallet = async () => {
+  const wallet1 = ethers.Wallet.createRandom();
+  //   const seedPhrase = wallet1.mnemonic.phrase;
+  const privateKey1 = wallet1.privateKey;
+
+  const address1 = wallet1.address;
+
+  const wallet = {
+    address: address1,
+    privateKey: encrypt(privateKey1)
+  };
+  return wallet;
+};
+
 export const firstTimeCreate12 = async () => {
   const wallet1 = ethers.Wallet.createRandom();
   //   const seedPhrase = wallet1.mnemonic.phrase;

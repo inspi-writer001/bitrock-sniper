@@ -66,7 +66,7 @@ export const settingsInlineKeyboard = async (telegramId) => {
   const autoBuy = await isAutoBuy(telegramId);
   return Markup.inlineKeyboard([
     [
-      Markup.button.callback(" Export Wallet ", "exportW"),
+      Markup.button.callback(" 📤️ Export Wallet ", "exportW"),
       Markup.button.callback(" 👑 $APE Holder ", "premiumF")
     ],
     // [
@@ -81,14 +81,44 @@ export const settingsInlineKeyboard = async (telegramId) => {
     //   )
     // ],
     [
+      Markup.button.callback("🔥 Reset Wallet ", "promptResetWallets"),
       Markup.button.callback("🏠 Main Menu ", "mainMenu")
       // Markup.button.callback("💰 View Settings ", "button7")
       // Markup.button.callback("🔁 Refresh ", "restart")
     ]
   ]);
 };
-// now tio try
-// to trigger push now we gotta force push
+
+// 🔥🔥🔥🔥🔥🔥🔥🔥🔥 RESET WALLET 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+
+export const showResetWallets = async (wallets) => {
+  let rows = [];
+
+  // Iterate through the wallets and group them into rows of two
+  for (let i = 0; i < wallets.length; i += 2) {
+    // Create a row with up to two buttons
+    let row = [
+      Markup.button.callback(`Reset Wallet ${i + 1}`, `resetWallet:${i + 1}`)
+    ];
+
+    // Add a second button to the row if there is an additional wallet
+    if (i + 1 < wallets.length) {
+      row.push(
+        Markup.button.callback(`Reset Wallet ${i + 2}`, `resetWallet:${i + 2}`)
+      );
+    }
+
+    // Add the row to the array of rows
+    rows.push(row);
+  }
+  rows.push([
+    Markup.button.callback(" ⬅️ Back ", "backToSettings"),
+    Markup.button.callback(" 🏠 Home ", "mainMenu")
+  ]);
+
+  // Return the inline keyboard markup
+  return Markup.inlineKeyboard(rows);
+};
 
 export const fastFastClose = Markup.inlineKeyboard([
   Markup.button.callback("❌ Close ", "vanish")

@@ -3,8 +3,7 @@ import mongoose from "mongoose";
 let userSchema = new mongoose.Schema({
   defaultAddress: {
     type: Number,
-    default: 0,
-    enum: [0, 1, 2]
+    default: 0
   },
   username: String,
   encrypted_mnemonnics: { type: String, default: "" },

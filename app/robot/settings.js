@@ -37,6 +37,7 @@ import {
   sellOptions,
   sellSettings,
   settingsInlineKeyboard,
+  showResetWallets,
   truncateText
 } from "../utils/keyboards.js";
 import { buyAddress, preSniper, selectToken, state } from "../index.js";
@@ -158,6 +159,20 @@ export const backToSettings = async (ctx) => {
     await ctx.editMessageReplyMarkup(keyBoardState.reply_markup);
   } catch (error) {
     log("==== error from backToSettings ====");
+    err(error);
+  }
+};
+
+export const doShowResetWallets = async (ctx) => {
+  try {
+    let username = ctx.from.id.toString();
+    let user = await findUser(username);
+    let userWallets = user.wallets;
+    const keyboardResponse = await showResetWallets(userWallets);
+
+    await ctx.editMessageReplyMarkup(keyboardResponse.reply_markup);
+  } catch (error) {
+    log("==== error from doShowResetWallets ====");
     err(error);
   }
 };

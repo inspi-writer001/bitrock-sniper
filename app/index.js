@@ -17,6 +17,7 @@ import {
   doClearSellHi_x,
   doClearSellLoAmount,
   doClearSellLo_x,
+  doShowResetWallets,
   doSwitchBuyType,
   preSnipeMenu,
   pullUpBuySettings,
@@ -30,6 +31,11 @@ import {
   vanish
 } from "./robot/settings.js";
 import {
+  resetWallet1,
+  resetWallet2,
+  resetWallet3,
+  resetWallet4,
+  resetWallet5,
   selectWallet1,
   selectWallet2,
   selectWallet3,
@@ -151,6 +157,7 @@ bot.action("selectWallet:w2", selectWallet2);
 bot.action("selectWallet:w3", selectWallet3);
 bot.action("selectWallet:w4", selectWallet4);
 bot.action("selectWallet:w5", selectWallet5);
+bot.action("resetWallet:1", selectWallet5);
 bot.action("editMinMCap", eeditMinMCap);
 bot.action("editMaxMCap", eeditMaxMCap);
 bot.action("editMinLiquidity", eeditMinLiquidity);
@@ -176,12 +183,18 @@ bot.action(
   sniperNew
 );
 bot.action("vanish", vanish);
+bot.action("resetWallet:1", resetWallet1);
+bot.action("resetWallet:2", resetWallet2);
+bot.action("resetWallet:3", resetWallet3);
+bot.action("resetWallet:4", resetWallet4);
+bot.action("resetWallet:5", resetWallet5);
 bot.action("mainMenu", startHandler);
 bot.action("premiumF", eeditPremium);
 bot.action("buy", buyPrompt);
 bot.action("exportW", exportWallet);
 bot.action("presnipe", preSnipeMenu);
 bot.action("removeFromPreSnipeList", closePreSnipe);
+bot.action("promptResetWallets", doShowResetWallets);
 bot.on("callback_query", sellCallBackQuery);
 pendingSettings();
 
