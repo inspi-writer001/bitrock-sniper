@@ -211,11 +211,26 @@ export const useSniper = async (
       let maxTransactionAmount = await tokenContract.Max_Transaction_Amount();
       log("===== max transaction amount =====");
       log(maxTransactionAmount);
-      let getTokenEquivalence = await tokenVariantPrice(
-        fromCustomLamport(maxTransactionAmount.toString(), decimal),
-        contractAddress
+
+      // alter logic to use contract to determine equivalent amountout
+
+      const equivalentAmountOutForMax = await rockRouterContract.getAmountsOut(
+        maxTransactionAmount.toString(),
+        [contractAddress, WETH]
       );
-      amount = getTokenEquivalence.brockBalance;
+
+      amount = equivalentAmountOutForMax[1].toString();
+      let convertedAmount = fromCustomLamport(amount, 18).toString();
+      log("estimated amout for buy all");
+      log(amount);
+      amount = convertedAmount;
+      log(amount);
+
+      // let getTokenEquivalence = await tokenVariantPrice(
+      //   fromCustomLamport(maxTransactionAmount.toString(), decimal),
+      //   contractAddress
+      // );
+      // amount = getTokenEquivalence.brockBalance;
       // amount = maxTransactionAmount.toString();
     } catch (error) {
       log("error from max snipe for individual");
@@ -231,7 +246,7 @@ export const useSniper = async (
     .parseEther(((95 / 100) * Number(amount)).toFixed(2).toString())
     .toString();
 
-  log("==== amounts out =====");
+  log("==== normal amounts out for weth =====");
   const exactAmountsOut = await rockRouterContract.getAmountsOut(
     structuredAmount,
     [WETH, contractAddress]

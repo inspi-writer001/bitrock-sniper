@@ -19,3 +19,4 @@ export default preSnipeSchema = mongoose.model(
 //     type: Number,
 //     enum: [0, 1, 2] // 0 isListening  ===> 1 isInTrade ===> 2 tradeClosed
 //   },
+// 384927
