@@ -446,7 +446,7 @@ export const preSnipeAction = async (bot) => {
                         } catch (errr) {
                           log("Error from making transaction:", errr);
 
-                          const message = `Wallet ${snipe.walletAddress} - Snipe 🔫 Failed 🔴\n🪅 CA: ${snipe.tokenContractAddress}`;
+                          const message = `Wallet ${snipe.walletAddress}\n\n| Snipe failed 🔫 Failed 🔴 |\n🪅 CA: ${snipe.tokenContractAddress}`;
 
                           // const message = `<b>snipe failed 😓, something went wrong sniping pool</b>`;
                           await bot.sendMessage(currentUser.username, message, {
