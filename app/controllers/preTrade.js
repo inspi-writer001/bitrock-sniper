@@ -434,7 +434,7 @@ export const preSnipeAction = async (bot) => {
 
                           await bot.sendMessage(
                             currentUser.username,
-                            `Wallet ${snipe.walletAddress} - Snipe 🔫 Successful 🟢\n CA: ${snipe.tokenContractAddress}\n<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>`,
+                            `💳️ Wallet ${snipe?.walletIndex}\n${snipe.walletAddress}\n\n| Snipe <a href="https://explorer.bit-rock.io/tx/${tookTrade.hash}">Transaction</a> 🔫 Successful 🟢 |\n\n🪅 CA: ($${snipe?.tokenTicker})\n${snipe.tokenContractAddress}`,
                             { parse_mode: "HTML" }
                           );
 
@@ -446,7 +446,7 @@ export const preSnipeAction = async (bot) => {
                         } catch (errr) {
                           log("Error from making transaction:", errr);
 
-                          const message = `Wallet ${snipe.walletAddress}\n\n| Snipe failed 🔫 Failed 🔴 |\n🪅 CA: ${snipe.tokenContractAddress}`;
+                          const message = `💳️ Wallet ${snipe?.walletIndex}\n${snipe.walletAddress}\n\n| Snipe failed 🔫 Failed 🔴 |\n🪅 CA: ${snipe.tokenContractAddress}`;
 
                           // const message = `<b>snipe failed 😓, something went wrong sniping pool</b>`;
                           await bot.sendMessage(currentUser.username, message, {
@@ -471,3 +471,5 @@ export const preSnipeAction = async (bot) => {
     console.error("Error in preSnipeAction:", error);
   }
 };
+
+// \n\n<b>cheers 🪄🎉, you sniped a pool. Here's your transaction hash:</b>\n<a href="https://explorer.bit-rock.io/search-results?q=${tookTrade.hash}"> view on explorer ${tookTrade.hash} </a>

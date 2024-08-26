@@ -48,6 +48,26 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
     const balanceWorth = await EthPrice(userBalance);
 
     log(formattedBalance);
+    let response_schema = {
+      data: {
+        id: "string",
+        type: "string",
+        attributes: {
+          name: "string",
+          address: "string",
+          symbol: "string",
+          decimals: 0,
+          total_supply: "string",
+          coingecko_coin_id: "string",
+          price_usd: "string",
+          fdv_usd: "string",
+          total_reserve_in_usd: "string",
+          volume_usd: {},
+          market_cap_usd: "string"
+        },
+        relationships: {}
+      }
+    };
     await axios
       .get(
         `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/tokens/${contractAddress}`,
@@ -60,6 +80,28 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
       .then(async (response) => {
         log("===== response from geckoterminal ====");
         let poolData = "";
+        let pool_response_schema = {
+          id: "string",
+          type: "string",
+          attributes: {
+            name: "string",
+            address: "string",
+            base_token_price_usd: "string",
+            quote_token_price_usd: "string",
+            base_token_price_native_currency: "string",
+            quote_token_price_native_currency: "string",
+            base_token_price_quote_token: "string",
+            quote_token_price_base_token: "string",
+            pool_created_at: "string",
+            reserve_in_usd: "string",
+            fdv_usd: "string",
+            market_cap_usd: "string",
+            price_change_percentage: {},
+            transactions: {},
+            volume_usd: {}
+          },
+          relationships: {}
+        };
         if (response.data.data.relationships.top_pools.data.length > 0) {
           const pool = await axios.get(
             `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/pools/${
@@ -134,7 +176,9 @@ export const buyTrade = async (contractAddress, ctx, sell = false) => {
                   userAddress: user.walletAddress,
                   contractAddress: contractAddress,
                   encrypted_mnemonics: user.encrypted_mnemonnics,
-                  decimals: response.data.data.attributes.decimals
+                  decimals: response.data.data.attributes.decimals,
+                  tokenName: response.data.data.attributes.name,
+                  tokenTicker: response.data.data.attributes.symbol
                 }
               };
             })()
