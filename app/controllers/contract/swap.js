@@ -156,7 +156,8 @@ export const useSniper = async (
     smartContractTestnetAddress,
     [
       "function swapExactETHForTokensSupportingFeeOnTransferTokens(address _tokenOut, uint256 amountOutMin, uint256 deadline)",
-      "function swapExactTokensForETHSupportingFeeOnTransferTokens(address _tokenIn, uint256 amountOutMin, uint256 amountInMax, uint256 deadline)"
+      "function swapExactTokensForETHSupportingFeeOnTransferTokens(address _tokenIn, uint256 amountOutMin, uint256 amountInMax, uint256 deadline)",
+      "function swapETHForExactTokens(uint256 amountOut,address[] calldata path,address to,uint256 deadline)"
     ],
     walletInstance
   );

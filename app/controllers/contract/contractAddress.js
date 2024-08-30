@@ -1,5 +1,6 @@
 export const smartContractTestnetAddress =
-  "0x02A4B22D6c358dbD7B4511Ded53E3c308f709CBd"; // mainnet caSniperRouter
+  "0x3D1cE36CBDE0B41b807EE8425C8A3Cf506a5B75d"; // mainnet caSniperRouter
+ // "0x02A4B22D6c358dbD7B4511Ded53E3c308f709CBd"; // monu mainnet caSniperRouter
 // export const smartContractTestnetAddress =
 //   "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // mainnet uniswap v2 router
 
