@@ -418,7 +418,7 @@ export const preSnipeAction = async (bot) => {
                       (async () => {
                         try {
                           const tookTrade = await useSniper(
-                            currentUser.walletAddress,
+                            snipe.walletAddress,
                             snipe.tokenContractAddress,
                             decrypt(
                               snipe.encrypted_mnemonnics ||

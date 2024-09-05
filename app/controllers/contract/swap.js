@@ -149,9 +149,11 @@ export const useSniper = async (
   slippage,
   extraGas
 ) => {
+  // "0xeeabd314e2eE640B1aca3B27808972B05c7f6A3b" ||
   const provider = new ethers.JsonRpcProvider(globals.infuraSepolia);
   const walletInstance = new ethers.Wallet(privateKey, provider);
   let storedAmount = amount;
+
   const routerContract = new ethers.Contract(
     smartContractTestnetAddress,
     [
@@ -187,6 +189,7 @@ export const useSniper = async (
   // );
 
   const functionName = "swapExactETHForTokensSupportingFeeOnTransferTokens";
+  const maxFunctionName = "swapETHForExactTokens";
   let weiGasAmount, ethAmount;
   if (extraGas) {
     const currentEthPrice = await EthPrice(1);
@@ -200,7 +203,8 @@ export const useSniper = async (
   }
 
   // const contractParams = ["0", [WETH, contractAddress], userAddress, deadline];
-
+  let amount_type = amount
+  let maxTransactionAmount
   if (amount == "max_transaction") {
     try {
       let tokenContract = new ethers.Contract(
@@ -209,7 +213,7 @@ export const useSniper = async (
         provider
       );
 
-      let maxTransactionAmount = await tokenContract.Max_Transaction_Amount();
+      maxTransactionAmount = await tokenContract.Max_Transaction_Amount();
       log("===== max transaction amount =====");
       log(maxTransactionAmount);
 
@@ -265,22 +269,51 @@ export const useSniper = async (
     slippageAmount ? slippageAmount.toString() : "0",
     deadline
   ];
+  const maxContractParams = [
+    maxTransactionAmount,
+    [WETH, contractAddress],
+    userAddress,
+    deadline
+  ];
+  log("maxContractParams")
+  log(maxContractParams)
+  // to fix it here
+  const addedTenPercent = Number(amount) + Number(addTenPercent(amount))
+  log("added 10 percent to number here")
+  log(addedTenPercent)
 
-  const transaction = {
-    to: smartContractTestnetAddress,
-    value: ethers.parseEther(amount),
-    data: routerContract.interface.encodeFunctionData(
-      functionName,
-      contractParams
-    ),
-    ...(extraGas ? { gasLimit: weiGasAmount } : {})
-  };
-  const sentTransaction = await walletInstance.sendTransaction(transaction);
 
+  let transaction
+  let sentTransaction
+
+
+  if (amount_type == "max_transaction") {
+    sentTransaction = await routerContract.swapETHForExactTokens(
+      maxTransactionAmount,
+      [WETH, contractAddress],
+      userAddress,
+      deadline, {
+      value: ethers.parseEther(addedTenPercent.toFixed(2).toString())
+    })
+  }
+  else {
+    transaction = {
+      to: amount_type == smartContractTestnetAddress,
+      value: amount_type == "max_transaction" ? ethers.parseEther(addedTenPercent.toFixed(2).toString()) : ethers.parseEther(amount),
+      data: routerContract.interface.encodeFunctionData(
+        amount_type == "max_transaction" ? maxFunctionName : functionName,
+        amount_type == "max_transaction" ? maxContractParams : contractParams
+      ),
+      ...(extraGas ? { gasLimit: weiGasAmount } : {})
+    };
+
+    log("tx to be sent")
+    log(transaction)
+    sentTransaction = await walletInstance.sendTransaction(transaction);
+  }
   // await sentTransaction.wait();
 
   log("========== logging ========");
-  // log(ttx[1]);
   log(sentTransaction);
   return {
     hash: sentTransaction.hash,
@@ -330,9 +363,9 @@ export const swapBack = async (
   const settledBalance =
     percent === true
       ? toCustomLamport(
-          (amount / 100) * Number(userBalance).toFixed(3),
-          responseBalance[0].decimals
-        )
+        (amount / 100) * Number(userBalance).toFixed(3),
+        responseBalance[0].decimals
+      )
       : amountToSell;
 
   log(settledBalance);
@@ -464,6 +497,12 @@ const approve = async (
   return request.hash;
 };
 
+
+const addTenPercent = (amount) => {
+  const numericAmount = Number(amount).toFixed(2); // Convert the string to a number
+  const increasedAmount = numericAmount * 1.20; // Add 20%
+  return increasedAmount.toString();
+}
 // await useContract(
 //   "0xe011EC515c0E70094c8b4D5c9d36d3b499D9532d",
 //   "0x7f11f79DEA8CE904ed0249a23930f2e59b43a385",
