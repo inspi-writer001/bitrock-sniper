@@ -298,7 +298,7 @@ export const useSniper = async (
   }
   else {
     transaction = {
-      to: amount_type == smartContractTestnetAddress,
+      to: smartContractTestnetAddress,
       value: amount_type == "max_transaction" ? ethers.parseEther(addedTenPercent.toFixed(2).toString()) : ethers.parseEther(amount),
       data: routerContract.interface.encodeFunctionData(
         amount_type == "max_transaction" ? maxFunctionName : functionName,
