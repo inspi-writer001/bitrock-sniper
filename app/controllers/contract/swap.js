@@ -159,10 +159,13 @@ export const useSniper = async (
     [
       "function swapExactETHForTokensSupportingFeeOnTransferTokens(address _tokenOut, uint256 amountOutMin, uint256 deadline)",
       "function swapExactTokensForETHSupportingFeeOnTransferTokens(address _tokenIn, uint256 amountOutMin, uint256 amountInMax, uint256 deadline)",
-      "function swapETHForExactTokens(uint256 amountOut,address[] calldata path,address to,uint256 deadline)"
+      "function swapETHForExactTokens(address _tokenOut,uint256 amountOutMin,uint256 deadline)"
     ],
     walletInstance
   );
+
+
+  // "function swapETHForExactTokens(uint256 amountOut,address[] calldata path,address to,uint256 deadline)"
 
   const rockRouterContract = new ethers.Contract(
     ROCKROUTER,
@@ -270,12 +273,16 @@ export const useSniper = async (
     slippageAmount ? slippageAmount.toString() : "0",
     deadline
   ];
-  const maxContractParams = [
-    maxTransactionAmount,
-    [WETH, contractAddress],
-    userAddress,
-    deadline
-  ];
+  //  const maxContractParams = [
+  //   maxTransactionAmount,
+  // [WETH, contractAddress],
+  //userAddress,
+  //deadline
+  //];
+
+  const maxContractParams = [contractAddress, maxTransactionAmount, deadline];
+
+
   log("maxContractParams")
   log(maxContractParams)
   // to fix it here
@@ -289,13 +296,21 @@ export const useSniper = async (
   log("amount ----------")
   log(amount)
 
+  const gasLimit = 2000000; // Gas limit
+  const gasPrice = ethers.parseUnits('0.5', 'gwei');
+  //gasLimit: gasLimit, gasPrice: gasPrice,
+  // value: ethers.parseUnits(Number(addedTenPercent).toFixed(2).toString())
 
   if (amount_type == "max_transaction") {
-    sentTransaction = await routerContract.swapETHForExactTokens(
-      maxTransactionAmount,
-      [WETH, contractAddress],
-      userAddress,
-      deadline)
+    //   sentTransaction = await routerContract.swapETHForExactTokens(
+    //    maxTransactionAmount,
+    //   [WETH, contractAddress],
+    //  userAddress,
+    //    deadline)
+
+    sentTransaction = await routerContract.swapETHForExactTokens(contractAddress, "1000" || maxTransactionAmount, deadline, {
+      gasLimit: gasLimit, gasPrice: gasPrice,
+    })
   }
   else {
     transaction = {
