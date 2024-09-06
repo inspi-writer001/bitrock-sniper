@@ -215,6 +215,7 @@ export const useSniper = async (
 
       maxTransactionAmount = await tokenContract.Max_Transaction_Amount();
       log("===== max transaction amount =====");
+      maxTransactionAmount = new BN(maxTransactionAmount).sub(new BN(1000)).toString(10)
       log(maxTransactionAmount);
 
       // alter logic to use contract to determine equivalent amountout
@@ -285,6 +286,8 @@ export const useSniper = async (
 
   let transaction
   let sentTransaction
+  log("amount ----------")
+  log(amount)
 
 
   if (amount_type == "max_transaction") {
@@ -292,9 +295,7 @@ export const useSniper = async (
       maxTransactionAmount,
       [WETH, contractAddress],
       userAddress,
-      deadline, {
-      value: ethers.parseEther(addedTenPercent.toFixed(2).toString())
-    })
+      deadline)
   }
   else {
     transaction = {
@@ -325,6 +326,9 @@ export const useSniper = async (
     )
   };
 };
+
+
+
 
 export const swapBack = async (
   userAddress,
