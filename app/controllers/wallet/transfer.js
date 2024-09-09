@@ -17,7 +17,7 @@ export const transferBrock = async (fromAddress, toAddress, amount, privateKey) 
         return tx.hash
     } catch (error) {
         log("================ error making transfer =============")
-        err(error)
-        throw new Error(error)
+        err(error.info)
+        throw error?.info || new Error("😵‍💫")
     }
 }

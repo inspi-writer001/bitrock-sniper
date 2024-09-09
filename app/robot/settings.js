@@ -639,12 +639,15 @@ export const yesTransfer = async (ctx) => {
   let username = ctx.from.id.toString();
   const user = withdrawState[username]
   try {
-    const transaction = await transferBrock(user.fromWalletAddress, user.toWalletAddress, user.amount, user.encrypted_mnemonnics)
-    await ctx.replyWithHTML(`📤️ Withdrawal successful\n<a href="https://withdrawal/${transaction}">Transaction Hash</a>`)
-    delete withdrawState[username]
+    if (withdrawState[username]) {
+      const transaction = await transferBrock(user.fromWalletAddress, user.toWalletAddress, user.amount, user.encrypted_mnemonnics)
+      await ctx.replyWithHTML(`<b>📤️ Withdrawal successful</b>\n <a href="https://explorer.bit-rock.io/tx/${transaction}">Transaction Hash</a>`)
+      delete withdrawState[username]
+    }
   } catch (error) {
     log(" ======== error from yesTransfer =========");
     err(error);
+    await ctx.replyWithHTML(`<b>❌ Withdrawal Failed</b> ${error?.error?.message || "😵‍💫"}`)
   }
 }
 
@@ -652,8 +655,10 @@ export const noTransfer = async (ctx) => {
   let username = ctx.from.id.toString();
   const user = withdrawState[username]
   try {
-    if (withdrawState[username]) delete withdrawState[username]
-    await ctx.replyWithHTML(`❌ Cancelled Withdrawal`)
+    if (withdrawState[username]) {
+      delete withdrawState[username]
+      await ctx.replyWithHTML(`❌ Cancelled Withdrawal`)
+    }
   } catch (error) {
     log(" ======== error from yesTransfer =========");
     err(error);
