@@ -69,22 +69,13 @@ export const settingsInlineKeyboard = async (telegramId) => {
       Markup.button.callback(" 📤️ Export Wallet ", "exportW"),
       Markup.button.callback(" 👑 $APE Holder ", "premiumF")
     ],
-    // [
-    //   Markup.button.callback(" Fast 🦄 ", "button8"),
-    //   Markup.button.callback(" Booster 🚀 ", "button7"),
-    //   Markup.button.callback(" Custom fee ", "customFee")
-    // ],
-    // [
-    //   Markup.button.callback(
-    //     ` ${autoBuy == 0 ? "🔴" : "✅"} Auto Buy `,
-    //     "autoBuy"
-    //   )
-    // ],
     [
       Markup.button.callback("🔥 Reset Wallet ", "promptResetWallets"),
       Markup.button.callback("🏠 Main Menu ", "mainMenu")
       // Markup.button.callback("💰 View Settings ", "button7")
       // Markup.button.callback("🔁 Refresh ", "restart")
+    ],  [
+      Markup.button.callback("🪙 Withdraw $BROCK ", "withdraw"),
     ]
   ]);
 };
@@ -145,6 +136,8 @@ export const selectWallet = Markup.inlineKeyboard([
   ]
 ]);
 
+
+
 export const buySettings = (user) =>
   Markup.inlineKeyboard([
     [
@@ -197,6 +190,16 @@ export const buySettings = (user) =>
 //   Markup.button.callback(" ✏️ Max Sell Tax  ", "editMaxSellTax"),
 //   Markup.button.callback(" ⌫ Clear Max ", "resetMaxSellTax")
 // ],
+
+
+
+export const withdrawYesorNo = Markup.inlineKeyboard([
+  [
+    Markup.button.callback(" ✅ Yes ", "yesWithdraw"),
+    Markup.button.callback(" ❌ No ", "noWithdraw")
+  ]
+]);
+
 
 export const sellSettings = Markup.inlineKeyboard([
   [

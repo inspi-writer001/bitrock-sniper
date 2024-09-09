@@ -40,9 +40,10 @@ import {
   showResetWallets,
   truncateText
 } from "../utils/keyboards.js";
-import { buyAddress, preSniper, selectToken, state } from "../index.js";
+import { buyAddress, preSniper, selectToken, state, withdrawState } from "../index.js";
 import { fetchETH } from "../controllers/fetchBalance.js";
 import { EthPrice, tokenVariantPrice } from "../utils/prices.js";
+import { transferBrock } from "../controllers/wallet/transfer.js";
 
 export const settingsHandler = async (ctx) => {
   let username = ctx.from.id.toString();
@@ -211,10 +212,9 @@ export const switchToSell = async (ctx) => {
         let poolData = "";
         if (response.data.data.relationships.top_pools.data.length > 0) {
           const pool = await axios.get(
-            `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/pools/${
-              response.data.data.relationships.top_pools.data[0].id.split(
-                "bitrock_"
-              )[1]
+            `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/pools/${response.data.data.relationships.top_pools.data[0].id.split(
+              "bitrock_"
+            )[1]
             }`,
             {
               headers: {
@@ -314,10 +314,9 @@ export const switchToBuy = async (ctx) => {
         let poolData = "";
         if (response.data.data.relationships.top_pools.data.length > 0) {
           const pool = await axios.get(
-            `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/pools/${
-              response.data.data.relationships.top_pools.data[0].id.split(
-                "bitrock_"
-              )[1]
+            `https://pro-api.coingecko.com/api/v3/onchain/networks/bitrock/pools/${response.data.data.relationships.top_pools.data[0].id.split(
+              "bitrock_"
+            )[1]
             }`,
             {
               headers: {
@@ -511,10 +510,8 @@ export const pullUpViewSettings = async (ctx) => {
     let user = await findUser(username);
 
     await ctx.replyWithHTML(
-      `Here are your configured settings ⛽️\n==========================\n<code>Buy Type                   ${
-        user.buyType == 0 ? "percentage" : "x units"
-      }\nSell Type                  ${
-        user.sellType == 0 ? "percentage" : "x units"
+      `Here are your configured settings ⛽️\n==========================\n<code>Buy Type                   ${user.buyType == 0 ? "percentage" : "x units"
+      }\nSell Type                  ${user.sellType == 0 ? "percentage" : "x units"
       }\nBuy Amount                 ${user.buyAmount || 0}</code>`,
       fastFastClose
     );
@@ -636,3 +633,29 @@ export const sellMenu = async (ctx) => {
     err(error);
   }
 };
+
+
+export const yesTransfer = async (ctx) => {
+  let username = ctx.from.id.toString();
+  const user = withdrawState[username]
+  try {
+    const transaction = await transferBrock(user.fromWalletAddress, user.toWalletAddress, user.amount, user.encrypted_mnemonnics)
+    await ctx.replyWithHTML(`📤️ Withdrawal successful\n<a href="https://withdrawal/${transaction}">Transaction Hash</a>`)
+    delete withdrawState[username]
+  } catch (error) {
+    log(" ======== error from yesTransfer =========");
+    err(error);
+  }
+}
+
+export const noTransfer = async (ctx) => {
+  let username = ctx.from.id.toString();
+  const user = withdrawState[username]
+  try {
+    if (withdrawState[username]) delete withdrawState[username]
+    await ctx.replyWithHTML(`❌ Cancelled Withdrawal`)
+  } catch (error) {
+    log(" ======== error from yesTransfer =========");
+    err(error);
+  }
+}

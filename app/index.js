@@ -19,6 +19,7 @@ import {
   doClearSellLo_x,
   doShowResetWallets,
   doSwitchBuyType,
+  noTransfer,
   preSnipeMenu,
   pullUpBuySettings,
   pullUpSellSettings,
@@ -28,7 +29,8 @@ import {
   switchToBuy,
   switchToSell,
   triggerAutoBuy,
-  vanish
+  vanish,
+  yesTransfer
 } from "./robot/settings.js";
 import {
   resetWallet1,
@@ -57,7 +59,8 @@ import {
   eeditSellHix,
   eeditSellLoAmount,
   eeditSellLox,
-  eeditSlippage
+  eeditSlippage,
+  promptForAddress
 } from "./robot/eedits.js";
 
 import { buy } from "./robot/buy.js";
@@ -70,6 +73,7 @@ import { openSnipes } from "./utils/keyboards.js";
 import { exportWallet } from "./controllers/wallet/createWallet.js";
 import { generateImage } from "./utils/generateImage.js";
 import { sniperNew } from "./robot/snipe.js";
+
 import { createPremiumCode } from "./database/premium.js";
 
 dotenv.config();
@@ -102,6 +106,7 @@ export const buyAddress = {};
 export const selectToken = {};
 export const selectPreSnipes = {};
 export const preSniper = {};
+export const withdrawState = {}  // userID: fromWalletAddress, toWalletAddress, amount, encrypted_mnemonnics
 
 export const bot = new Telegraf(process.env.TELEGRAM_API);
 // bot.use(async (ctx, next) => {
@@ -195,6 +200,9 @@ bot.action("exportW", exportWallet);
 bot.action("presnipe", preSnipeMenu);
 bot.action("removeFromPreSnipeList", closePreSnipe);
 bot.action("promptResetWallets", doShowResetWallets);
+bot.action("withdraw", promptForAddress);
+bot.action("yesWithdraw", yesTransfer)
+bot.action("noWithdraw", noTransfer)
 bot.on("callback_query", sellCallBackQuery);
 pendingSettings();
 

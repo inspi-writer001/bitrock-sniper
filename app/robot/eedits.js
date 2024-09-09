@@ -1,7 +1,8 @@
 import {
   buySettingsState,
   premiumSettingsState,
-  sellSettingsState
+  sellSettingsState,
+  withdrawState
 } from "../index.js";
 
 export const eeditMinMCap = async (ctx) => {
@@ -120,3 +121,11 @@ export const eeditPremium = async (ctx) => {
   };
   await ctx.replyWithHTML(`<code>Enter Premium Code - 👑 </code>`);
 };
+
+export const promptForAddress = async (ctx) => {
+  let username = ctx.from.id.toString();
+  withdrawState[username] = {
+    type: "withdraw"
+  }
+  await ctx.replyWithHTML(`<code>Enter recepient address - 🔭 </code>`);
+}
