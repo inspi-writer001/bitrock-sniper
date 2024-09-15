@@ -159,11 +159,10 @@ export const useSniper = async (
     [
       "function swapExactETHForTokensSupportingFeeOnTransferTokens(address _tokenOut, uint256 amountOutMin, uint256 deadline)",
       "function swapExactTokensForETHSupportingFeeOnTransferTokens(address _tokenIn, uint256 amountOutMin, uint256 amountInMax, uint256 deadline)",
-      "function swapETHForExactTokens(address _tokenOut,uint256 amountOutMin,uint256 deadline)"
+      "function swapETHForExactTokens(address _tokenOut, uint256 amountOutMin, uint256 deadline)"
     ],
     walletInstance
   );
-
 
   // "function swapETHForExactTokens(uint256 amountOut,address[] calldata path,address to,uint256 deadline)"
 
@@ -206,8 +205,8 @@ export const useSniper = async (
   }
 
   // const contractParams = ["0", [WETH, contractAddress], userAddress, deadline];
-  let amount_type = amount
-  let maxTransactionAmount
+  let amount_type = amount;
+  let maxTransactionAmount;
   if (amount == "max_transaction") {
     try {
       let tokenContract = new ethers.Contract(
@@ -218,7 +217,14 @@ export const useSniper = async (
 
       maxTransactionAmount = await tokenContract.Max_Transaction_Amount();
       log("===== max transaction amount =====");
-      maxTransactionAmount = new BN(maxTransactionAmount).sub(new BN(1000)).toString(10)
+      maxTransactionAmount = maxTransactionAmount.toString();
+
+      // maxTransactionAmount = new BN(maxTransactionAmount)
+      //   .sub(new BN(maxTransactionAmount).mul(new BN(10)).div(new BN(100))) // Subtract 15%
+      //   .toString(10);
+
+      // the way thart works initially was to subtract 70 % at least from tyhe first snipe amount on max_amount
+
       log(maxTransactionAmount);
 
       // alter logic to use contract to determine equivalent amountout
@@ -282,40 +288,66 @@ export const useSniper = async (
 
   const maxContractParams = [contractAddress, maxTransactionAmount, deadline];
 
-
-  log("maxContractParams")
-  log(maxContractParams)
+  log("maxContractParams");
+  log(maxContractParams);
   // to fix it here
-  const addedTenPercent = Number(amount) + Number(addTenPercent(amount))
-  log("added 10 percent to number here")
-  log(addedTenPercent)
+  const addedTenPercent = Number(amount) + Number(addTenPercent(amount));
+  log("added 10 percent to number here");
+  log(addedTenPercent);
 
-
-  let transaction
-  let sentTransaction
-  log("amount ----------")
-  log(amount)
+  let transaction;
+  let sentTransaction;
+  log("amount ----------");
+  log(amount);
 
   const gasLimit = 2000000; // Gas limit
-  const gasPrice = ethers.parseUnits('0.5', 'gwei');
+  const gasPrice = ethers.parseUnits("0.5", "gwei");
+  const nonce = await provider.getTransactionCount(userAddress);
   //gasLimit: gasLimit, gasPrice: gasPrice,
   // value: ethers.parseUnits(Number(addedTenPercent).toFixed(2).toString())
 
   if (amount_type == "max_transaction") {
+    const userBalance = (await provider.getBalance(userAddress)).toString();
+    log("this is user's balance");
+    log(userBalance);
+    log("---- amount I'm sending to the contract ----");
+    log(ethers.parseUnits(Number(addedTenPercent).toFixed(2).toString()));
+
+    log({
+      contractAddress,
+      maxTransactionAmount: maxTransactionAmount,
+      deadline,
+      data: {
+        value: ethers.parseUnits(Number(addedTenPercent).toFixed(2).toString()),
+        gasLimit: gasLimit,
+        gasPrice: gasPrice,
+        nonce
+      }
+    });
     //   sentTransaction = await routerContract.swapETHForExactTokens(
     //    maxTransactionAmount,
     //   [WETH, contractAddress],
     //  userAddress,
     //    deadline)
 
-    sentTransaction = await routerContract.swapETHForExactTokens(contractAddress, "1000" || maxTransactionAmount, deadline, {
-      gasLimit: gasLimit, gasPrice: gasPrice,
-    })
-  }
-  else {
+    sentTransaction = await routerContract.swapETHForExactTokens(
+      contractAddress,
+      maxTransactionAmount,
+      deadline,
+      {
+        value: ethers.parseUnits(Number(addedTenPercent).toFixed(2).toString())
+        // gasLimit: gasLimit,
+        // gasPrice: gasPrice,
+        // nonce
+      }
+    );
+  } else {
     transaction = {
       to: smartContractTestnetAddress,
-      value: amount_type == "max_transaction" ? ethers.parseEther(addedTenPercent.toFixed(2).toString()) : ethers.parseEther(amount),
+      value:
+        amount_type == "max_transaction"
+          ? ethers.parseEther(addedTenPercent.toFixed(2).toString())
+          : ethers.parseEther(amount),
       data: routerContract.interface.encodeFunctionData(
         amount_type == "max_transaction" ? maxFunctionName : functionName,
         amount_type == "max_transaction" ? maxContractParams : contractParams
@@ -323,14 +355,14 @@ export const useSniper = async (
       ...(extraGas ? { gasLimit: weiGasAmount } : {})
     };
 
-    log("tx to be sent")
-    log(transaction)
+    log("tx to be sent");
+    log(transaction);
     sentTransaction = await walletInstance.sendTransaction(transaction);
   }
   // await sentTransaction.wait();
 
-  log("========== logging ========");
-  log(sentTransaction);
+  // log("========== logging ========");
+  // log(sentTransaction);
   return {
     hash: sentTransaction.hash,
     amountOut: fromCustomLamport(
@@ -341,9 +373,6 @@ export const useSniper = async (
     )
   };
 };
-
-
-
 
 export const swapBack = async (
   userAddress,
@@ -382,9 +411,9 @@ export const swapBack = async (
   const settledBalance =
     percent === true
       ? toCustomLamport(
-        (amount / 100) * Number(userBalance).toFixed(3),
-        responseBalance[0].decimals
-      )
+          (amount / 100) * Number(userBalance).toFixed(3),
+          responseBalance[0].decimals
+        )
       : amountToSell;
 
   log(settledBalance);
@@ -516,12 +545,11 @@ const approve = async (
   return request.hash;
 };
 
-
 const addTenPercent = (amount) => {
   const numericAmount = Number(amount).toFixed(2); // Convert the string to a number
-  const increasedAmount = numericAmount * 1.20; // Add 20%
+  const increasedAmount = numericAmount * 1.2; // Add 25%
   return increasedAmount.toString();
-}
+};
 // await useContract(
 //   "0xe011EC515c0E70094c8b4D5c9d36d3b499D9532d",
 //   "0x7f11f79DEA8CE904ed0249a23930f2e59b43a385",
