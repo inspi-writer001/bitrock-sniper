@@ -124,18 +124,25 @@ export const useContract = async (
 
   // await sentTransaction.wait();
 
-  log("========== logging ========");
-  // log(ttx[1]);
-  log(sentTransaction);
-  return {
-    hash: sentTransaction.hash,
-    amountOut: fromCustomLamport(
-      slippageAmount
-        ? slippageAmount.toString()
-        : exactAmountsOut[1].toString(),
-      decimal
-    )
-  };
+  // log("========== logging ========");
+  // // log(ttx[1]);
+  // log(sentTransaction);
+  const receipt = await provider.waitForTransaction(sentTransaction.hash);
+  log(receipt);
+  // await delay(2000);
+  if (receipt.status === 1) {
+    return {
+      hash: sentTransaction.hash,
+      amountOut: fromCustomLamport(
+        slippageAmount
+          ? slippageAmount.toString()
+          : exactAmountsOut[1].toString(),
+        decimal
+      )
+    };
+  } else {
+    throw "transaction failed";
+  }
 };
 
 export const useSniper = async (
@@ -225,7 +232,7 @@ export const useSniper = async (
 
       // the way thart works initially was to subtract 70 % at least from tyhe first snipe amount on max_amount
 
-      log(maxTransactionAmount);
+      // log(maxTransactionAmount);
 
       // alter logic to use contract to determine equivalent amountout
 
@@ -254,8 +261,8 @@ export const useSniper = async (
     }
   }
 
-  log("here's what amount looks like ");
-  log(amount.toString());
+  // log("here's what amount looks like ");
+  // log(amount.toString());
 
   let structuredAmount = ethers
     .parseEther(((95 / 100) * Number(amount)).toFixed(2).toString())
@@ -355,23 +362,29 @@ export const useSniper = async (
       ...(extraGas ? { gasLimit: weiGasAmount } : {})
     };
 
-    log("tx to be sent");
-    log(transaction);
+    // log("tx to be sent");
+    // log(transaction);
     sentTransaction = await walletInstance.sendTransaction(transaction);
   }
   // await sentTransaction.wait();
 
   // log("========== logging ========");
   // log(sentTransaction);
-  return {
-    hash: sentTransaction.hash,
-    amountOut: fromCustomLamport(
-      slippageAmount
-        ? slippageAmount.toString()
-        : exactAmountsOut[1].toString(),
-      decimal
-    )
-  };
+  // await delay(2000);
+  const receipt = await provider.waitForTransaction(sentTransaction.hash);
+  if (receipt.status === 1) {
+    return {
+      hash: sentTransaction.hash,
+      amountOut: fromCustomLamport(
+        slippageAmount
+          ? slippageAmount.toString()
+          : exactAmountsOut[1].toString(),
+        decimal
+      )
+    };
+  } else {
+    throw "transaction failed";
+  }
 };
 
 export const swapBack = async (
@@ -403,7 +416,7 @@ export const swapBack = async (
   ).toFixed(3);
 
   const amountToSell = toCustomLamport(amount, responseBalance[0].decimals);
-  log(" ======= amount to sell in its decimals ========= ");
+  log("======= amount to sell in its decimals ========= ");
 
   log(amountToSell);
   log(userBalance);
@@ -470,7 +483,7 @@ export const swapBack = async (
     ).then((e) => {
       log(e);
     });
-    log(" ======== approval successful ======");
+    log("======== approval successful ======");
   } catch (error) {
     log("approval error =====");
     err(error);
@@ -504,19 +517,24 @@ export const swapBack = async (
   //     userAddress,
   //     deadline
   //   );
-  log("===== swapBack =====");
-  log(swapBacks);
-
-  return {
-    hash: swapBacks.hash,
-    amountOut: fromCustomLamport(
-      ((exactAmountsOut[1] * BigInt(94)) / BigInt(100)).toString(),
-      "18"
-    ).toFixed(2),
-    amount: Number(
-      fromCustomLamport(settledBalance.toString(), decimal.toString())
-    ).toFixed(2)
-  };
+  // log("===== swapBack =====");
+  // log(swapBacks);
+  // await delay(2000);
+  const receipt = await provider.waitForTransaction(swapBacks.hash);
+  if (receipt.status === 1) {
+    return {
+      hash: swapBacks.hash,
+      amountOut: fromCustomLamport(
+        ((exactAmountsOut[1] * BigInt(94)) / BigInt(100)).toString(),
+        "18"
+      ).toFixed(2),
+      amount: Number(
+        fromCustomLamport(settledBalance.toString(), decimal.toString())
+      ).toFixed(2)
+    };
+  } else {
+    throw "transaction failed";
+  }
 };
 
 const approve = async (
@@ -550,6 +568,10 @@ const addTenPercent = (amount) => {
   const increasedAmount = numericAmount * 1.2; // Add 25%
   return increasedAmount.toString();
 };
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 // await useContract(
 //   "0xe011EC515c0E70094c8b4D5c9d36d3b499D9532d",
 //   "0x7f11f79DEA8CE904ed0249a23930f2e59b43a385",
