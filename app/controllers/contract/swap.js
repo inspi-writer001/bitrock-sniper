@@ -127,22 +127,22 @@ export const useContract = async (
   // log("========== logging ========");
   // // log(ttx[1]);
   // log(sentTransaction);
-  const receipt = await provider.waitForTransaction(sentTransaction.hash);
-  log(receipt);
+  // const receipt = await provider.waitForTransaction(sentTransaction.hash);
+  // log(receipt);
   // await delay(2000);
-  if (receipt.status === 1) {
-    return {
-      hash: sentTransaction.hash,
-      amountOut: fromCustomLamport(
-        slippageAmount
-          ? slippageAmount.toString()
-          : exactAmountsOut[1].toString(),
-        decimal
-      )
-    };
-  } else {
-    throw "transaction failed";
-  }
+  // if (receipt.status === 1) {
+  return {
+    hash: sentTransaction.hash,
+    amountOut: fromCustomLamport(
+      slippageAmount
+        ? slippageAmount.toString()
+        : exactAmountsOut[1].toString(),
+      decimal
+    )
+  };
+  // } else {
+  //   throw "transaction failed";
+  // }
 };
 
 export const useSniper = async (
@@ -191,11 +191,6 @@ export const useSniper = async (
   // );
   // "0xcd520AFabcfdA94f2fe3321ed0570CBFE2eD8A24" ||
   const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // Set a deadline (10 minutes from now)
-  // const taxes = await contract.getTaxes();
-  // const ttx = await routerContract.getAmountsOut(
-  //   Number(ethers.parseEther(amount)).toString(),
-  //   [WETH, contractAddress]
-  // );
 
   const functionName = "swapExactETHForTokensSupportingFeeOnTransferTokens";
   const maxFunctionName = "swapETHForExactTokens";
@@ -315,9 +310,10 @@ export const useSniper = async (
 
   if (amount_type == "max_transaction") {
     const userBalance = (await provider.getBalance(userAddress)).toString();
+    const balanceConsideringGas = subtractPercentage(userBalance, 10);
     log("this is user's balance");
     log(userBalance);
-    log("---- amount I'm sending to the contract ----");
+    log("---- token amount I'm sending to the contract ----");
     log(ethers.parseUnits(Number(addedTenPercent).toFixed(2).toString()));
 
     log({
@@ -325,7 +321,9 @@ export const useSniper = async (
       maxTransactionAmount: maxTransactionAmount,
       deadline,
       data: {
-        value: ethers.parseUnits(Number(addedTenPercent).toFixed(2).toString()),
+        value:
+          balanceConsideringGas ||
+          ethers.parseUnits(Number(addedTenPercent).toFixed(2).toString()),
         gasLimit: gasLimit,
         gasPrice: gasPrice,
         nonce
@@ -342,7 +340,9 @@ export const useSniper = async (
       maxTransactionAmount,
       deadline,
       {
-        value: ethers.parseUnits(Number(addedTenPercent).toFixed(2).toString())
+        value:
+          balanceConsideringGas ||
+          ethers.parseUnits(Number(addedTenPercent).toFixed(2).toString())
         // gasLimit: gasLimit,
         // gasPrice: gasPrice,
         // nonce
@@ -520,21 +520,21 @@ export const swapBack = async (
   // log("===== swapBack =====");
   // log(swapBacks);
   // await delay(2000);
-  const receipt = await provider.waitForTransaction(swapBacks.hash);
-  if (receipt.status === 1) {
-    return {
-      hash: swapBacks.hash,
-      amountOut: fromCustomLamport(
-        ((exactAmountsOut[1] * BigInt(94)) / BigInt(100)).toString(),
-        "18"
-      ).toFixed(2),
-      amount: Number(
-        fromCustomLamport(settledBalance.toString(), decimal.toString())
-      ).toFixed(2)
-    };
-  } else {
-    throw "transaction failed";
-  }
+  // const receipt = await provider.waitForTransaction(swapBacks.hash);
+  // if (receipt.status === 1) {
+  return {
+    hash: swapBacks.hash,
+    amountOut: fromCustomLamport(
+      ((exactAmountsOut[1] * BigInt(94)) / BigInt(100)).toString(),
+      "18"
+    ).toFixed(2),
+    amount: Number(
+      fromCustomLamport(settledBalance.toString(), decimal.toString())
+    ).toFixed(2)
+  };
+  // } else {
+  //   throw "transaction failed";
+  // }
 };
 
 const approve = async (
@@ -567,6 +567,18 @@ const addTenPercent = (amount) => {
   const numericAmount = Number(amount).toFixed(2); // Convert the string to a number
   const increasedAmount = numericAmount * 1.2; // Add 25%
   return increasedAmount.toString();
+};
+
+const subtractPercentage = (bnValue, percentage) => {
+  // Convert percentage to a BN (e.g., 20% is 0.20, multiply by 100 to work with whole numbers)
+  let bnValueBN = new BN(bnValue);
+  const percentageBN = new BN(percentage * 100);
+  const hundredBN = new BN(10000); // Use 10000 to handle percentages with decimals
+
+  // Subtract percentage: bnValue * (10000 - percentage) / 10000
+  const result = bnValueBN.mul(hundredBN.sub(percentageBN)).div(hundredBN);
+
+  return result.toString(10);
 };
 
 function delay(ms) {
