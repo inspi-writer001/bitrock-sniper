@@ -165,7 +165,7 @@ export const sendPnl = async (ctx) => {
 
     const tokenI = await tokenInfo(userStateTrade);
     const imageUrl = await generateImage(
-      `${truncateText(userTrade.tokenName)} / BROCK`,
+      `${truncateText(userTrade?.tokenName)} / BROCK`,
       "| SELL",
       userTrade.entryPrice,
       tokenI.attributes.price_usd
