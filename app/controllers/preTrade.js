@@ -374,7 +374,7 @@ const routerContract = smartContractTestnetAddress; // mainnet router
 //   }
 // };
 
-const encapsulatedSniperFunction = async () => {
+const encapsulatedSniperFunction = async (bot) => {
   const provider = new ethers.JsonRpcProvider(globals.infuraSepolia); // mainnet
 
   provider.on("pending", async (txHash) => {
@@ -470,17 +470,17 @@ const encapsulatedSniperFunction = async () => {
 
 export const preSnipeAction = async (bot) => {
   try {
-    await encapsulatedSniperFunction();
+    await encapsulatedSniperFunction(bot);
   } catch (error) {
     console.error("Error in preSnipeAction:", error);
     console.log("retrying sniper ----- ::::");
     try {
-      await encapsulatedSniperFunction();
+      await encapsulatedSniperFunction(bot);
     } catch (error1) {
       console.error("Error in preSnipeAction Again:", error1);
       console.log("retrying sniper ----- ::::");
       try {
-        await encapsulatedSniperFunction();
+        await encapsulatedSniperFunction(bot);
       } catch (error2) {
         console.error("Error in preSnipeAction:", error2);
       }
