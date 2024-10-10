@@ -29,7 +29,7 @@ export const startHandler = async (ctx) => {
       `<b> 🚀 Elite Sniper Bot - Official Sniper Bot on the Bitrock Blockchain 🎯</b>\n\n` +
       `⚙️ Team Elite\n\n` +
       `Trade any tokens on the Bitrock blockchain, easy fast and effortlessly.\n\n` +
-      `📚 Elite Sniper Academy\n\n` +
+      `📚 <a href="https://bitrock-elitebot.gitbook.io/elitebotguide">Elite Sniper Academy</a>\n\n` +
       `💬 <a href="http://t.me/ApeOnBitrock">Official $APE TG</a>\n\n` +
       `📢 <a href="http://t.me/SniperDaoCalls"> Sniper Dao Calls </a>\n\n` +
       `🌐 <a href="https://apetoken.net">Website</a>\n\n` +

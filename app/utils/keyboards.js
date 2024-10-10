@@ -56,7 +56,10 @@ export const inlineKeyboard = async (telegramId) => {
     // [Markup.button.callback(" 🔑 Mnemonics ", "button8")],
 
     [
-      Markup.button.webApp(" Help ", "https://apetoken.net")
+      Markup.button.webApp(
+        " Help ",
+        "https://bitrock-elitebot.gitbook.io/elitebotguide"
+      )
       // Markup.button.callback("💰 View Settings ", "button7")
       // Markup.button.callback("🔁 Refresh ", "restart")
     ]
@@ -74,9 +77,8 @@ export const settingsInlineKeyboard = async (telegramId) => {
       Markup.button.callback("🏠 Main Menu ", "mainMenu")
       // Markup.button.callback("💰 View Settings ", "button7")
       // Markup.button.callback("🔁 Refresh ", "restart")
-    ],  [
-      Markup.button.callback("🪙 Withdraw $BROCK ", "withdraw"),
-    ]
+    ],
+    [Markup.button.callback("🪙 Withdraw $BROCK ", "withdraw")]
   ]);
 };
 
@@ -136,8 +138,6 @@ export const selectWallet = Markup.inlineKeyboard([
   ]
 ]);
 
-
-
 export const buySettings = (user) =>
   Markup.inlineKeyboard([
     [
@@ -191,15 +191,12 @@ export const buySettings = (user) =>
 //   Markup.button.callback(" ⌫ Clear Max ", "resetMaxSellTax")
 // ],
 
-
-
 export const withdrawYesorNo = Markup.inlineKeyboard([
   [
     Markup.button.callback(" ✅ Yes ", "yesWithdraw"),
     Markup.button.callback(" ❌ No ", "noWithdraw")
   ]
 ]);
-
 
 export const sellSettings = Markup.inlineKeyboard([
   [
