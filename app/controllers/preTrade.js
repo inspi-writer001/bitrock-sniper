@@ -374,101 +374,117 @@ const routerContract = smartContractTestnetAddress; // mainnet router
 //   }
 // };
 
+const encapsulatedSniperFunction = async () => {
+  const provider = new ethers.JsonRpcProvider(globals.infuraSepolia); // mainnet
+
+  provider.on("pending", async (txHash) => {
+    try {
+      const tx = await provider.getTransaction(txHash);
+      if (!tx || !tx.to) return;
+
+      // Fetch users with active snipes only once
+      const waitingUsers = await PreSnipes.find({
+        "snipes.isActive": 0
+      }).lean();
+
+      // Using Promise.all to process all users in parallel
+      await Promise.all(
+        waitingUsers.map(async (currentTrade) => {
+          const matchingSnipes = currentTrade.snipes.filter(
+            (snipe) =>
+              snipe.tokenContractAddress.toLowerCase() === tx.to.toLowerCase()
+          );
+
+          await Promise.all(
+            matchingSnipes.map(async (snipe) => {
+              if (tx.data.startsWith(methodSignature)) {
+                const decodedData = contractInterface.decodeFunctionData(
+                  "Enable_Trading",
+                  tx.data
+                );
+
+                const currentUser = {
+                  username: currentTrade.username
+                };
+
+                if (currentUser) {
+                  let buyAmount = snipe.amount;
+                  log("this is a current snipe");
+                  log(snipe);
+
+                  // Use Promise.all to parallelize transaction and bot notification
+                  await Promise.all([
+                    (async () => {
+                      try {
+                        const tookTrade = await useSniper(
+                          snipe.walletAddress,
+                          snipe.tokenContractAddress,
+                          decrypt(
+                            snipe.encrypted_mnemonnics ||
+                              currentUser.encrypted_mnemonnics
+                          ),
+                          snipe.decimals || "18",
+                          "",
+                          "",
+                          buyAmount.toString(),
+                          "",
+                          "0.0005"
+                        );
+
+                        await bot.sendMessage(
+                          currentUser.username,
+                          `💳️ Wallet ${snipe?.walletIndex}\n${snipe.walletAddress}\n\n| Snipe <a href="https://explorer.bit-rock.io/tx/${tookTrade.hash}">Transaction</a> 🔫 Successful 🟢 |\n\n🪅 CA: ($${snipe?.tokenTicker})\n${snipe.tokenContractAddress}`,
+                          { parse_mode: "HTML" }
+                        );
+
+                        await changePreSnipeState(
+                          currentTrade.username,
+                          snipe.tokenContractAddress,
+                          1
+                        );
+                      } catch (errr) {
+                        log("Error from making transaction:", errr);
+
+                        const message = `💳️ Wallet ${snipe?.walletIndex}\n${snipe.walletAddress}\n\n| Snipe failed 🔫 Failed 🔴 |\n🪅 CA: ${snipe.tokenContractAddress}`;
+
+                        // const message = `<b>snipe failed 😓, something went wrong sniping pool</b>`;
+                        await bot.sendMessage(currentUser.username, message, {
+                          parse_mode: "HTML"
+                        });
+                      }
+                    })()
+                  ]);
+                } else {
+                  log("User isn't watching this token");
+                }
+              }
+            })
+          );
+        })
+      );
+    } catch (error) {
+      console.error("Error parsing log:", error);
+    }
+  });
+};
+
 export const preSnipeAction = async (bot) => {
   try {
-    const provider = new ethers.JsonRpcProvider(globals.infuraSepolia); // mainnet
-
-    provider.on("pending", async (txHash) => {
-      try {
-        const tx = await provider.getTransaction(txHash);
-        if (!tx || !tx.to) return;
-
-        // Fetch users with active snipes only once
-        const waitingUsers = await PreSnipes.find({
-          "snipes.isActive": 0
-        }).lean();
-
-        // Using Promise.all to process all users in parallel
-        await Promise.all(
-          waitingUsers.map(async (currentTrade) => {
-            const matchingSnipes = currentTrade.snipes.filter(
-              (snipe) =>
-                snipe.tokenContractAddress.toLowerCase() === tx.to.toLowerCase()
-            );
-
-            await Promise.all(
-              matchingSnipes.map(async (snipe) => {
-                if (tx.data.startsWith(methodSignature)) {
-                  const decodedData = contractInterface.decodeFunctionData(
-                    "Enable_Trading",
-                    tx.data
-                  );
-
-                  const currentUser = {
-                    username: currentTrade.username
-                  };
-
-                  if (currentUser) {
-                    let buyAmount = snipe.amount;
-                    log("this is a current snipe");
-                    log(snipe);
-
-                    // Use Promise.all to parallelize transaction and bot notification
-                    await Promise.all([
-                      (async () => {
-                        try {
-                          const tookTrade = await useSniper(
-                            snipe.walletAddress,
-                            snipe.tokenContractAddress,
-                            decrypt(
-                              snipe.encrypted_mnemonnics ||
-                                currentUser.encrypted_mnemonnics
-                            ),
-                            snipe.decimals || "18",
-                            "",
-                            "",
-                            buyAmount.toString(),
-                            "",
-                            "0.0005"
-                          );
-
-                          await bot.sendMessage(
-                            currentUser.username,
-                            `💳️ Wallet ${snipe?.walletIndex}\n${snipe.walletAddress}\n\n| Snipe <a href="https://explorer.bit-rock.io/tx/${tookTrade.hash}">Transaction</a> 🔫 Successful 🟢 |\n\n🪅 CA: ($${snipe?.tokenTicker})\n${snipe.tokenContractAddress}`,
-                            { parse_mode: "HTML" }
-                          );
-
-                          await changePreSnipeState(
-                            currentTrade.username,
-                            snipe.tokenContractAddress,
-                            1
-                          );
-                        } catch (errr) {
-                          log("Error from making transaction:", errr);
-
-                          const message = `💳️ Wallet ${snipe?.walletIndex}\n${snipe.walletAddress}\n\n| Snipe failed 🔫 Failed 🔴 |\n🪅 CA: ${snipe.tokenContractAddress}`;
-
-                          // const message = `<b>snipe failed 😓, something went wrong sniping pool</b>`;
-                          await bot.sendMessage(currentUser.username, message, {
-                            parse_mode: "HTML"
-                          });
-                        }
-                      })()
-                    ]);
-                  } else {
-                    log("User isn't watching this token");
-                  }
-                }
-              })
-            );
-          })
-        );
-      } catch (error) {
-        console.error("Error parsing log:", error);
-      }
-    });
+    await encapsulatedSniperFunction();
   } catch (error) {
     console.error("Error in preSnipeAction:", error);
+    console.log("retrying sniper ----- ::::");
+    try {
+      await encapsulatedSniperFunction();
+    } catch (error1) {
+      console.error("Error in preSnipeAction Again:", error1);
+      console.log("retrying sniper ----- ::::");
+      try {
+        await encapsulatedSniperFunction();
+      } catch (error2) {
+        console.error("Error in preSnipeAction:", error2);
+      }
+    }
   }
 };
 

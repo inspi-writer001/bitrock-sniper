@@ -106,7 +106,7 @@ export const buyAddress = {};
 export const selectToken = {};
 export const selectPreSnipes = {};
 export const preSniper = {};
-export const withdrawState = {}  // userID: fromWalletAddress, toWalletAddress, amount, encrypted_mnemonnics
+export const withdrawState = {}; // userID: fromWalletAddress, toWalletAddress, amount, encrypted_mnemonnics
 
 export const bot = new Telegraf(process.env.TELEGRAM_API);
 // bot.use(async (ctx, next) => {
@@ -201,8 +201,8 @@ bot.action("presnipe", preSnipeMenu);
 bot.action("removeFromPreSnipeList", closePreSnipe);
 bot.action("promptResetWallets", doShowResetWallets);
 bot.action("withdraw", promptForAddress);
-bot.action("yesWithdraw", yesTransfer)
-bot.action("noWithdraw", noTransfer)
+bot.action("yesWithdraw", yesTransfer);
+bot.action("noWithdraw", noTransfer);
 bot.on("callback_query", sellCallBackQuery);
 pendingSettings();
 
