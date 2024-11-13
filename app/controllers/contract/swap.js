@@ -13,8 +13,9 @@ import { EthPrice, tokenVariantPrice } from "../../utils/prices.js";
 import { COINTOOL_ABI } from "./cointoolAbi.js";
 
 // TODO change sepolia WETH to mainnet WETH
-const WETH = "0x413f0E3A440abA7A15137F4278121450416882d5";
+export const WETH = "0x413f0E3A440abA7A15137F4278121450416882d5";
 const ROCKROUTER = "0xeeabd314e2eE640B1aca3B27808972B05c7f6A3b";
+const USDB = "0xD647a6E1F898c39bA594443c19De0872EA935310";
 //  "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9"; // sepolia
 
 const tokenABI = [
@@ -584,6 +585,30 @@ const subtractPercentage = (bnValue, percentage) => {
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+// export const fetchCurrentPairUSDPrice = async (tokenContractAddress) => {
+//   const rockRouterContract = new ethers.Contract(
+//     ROCKROUTER,
+//     [
+//       "function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts)"
+//     ],
+//     provider
+//   );
+
+//   //  usdb has 6 decimals
+//   const convertedAmount = toCustomLamport("1", "6");
+
+//   const contractMethod = rockRouterContract.getAmountsOut(convertedAmount, [
+//     USDB,
+//     tokenContractAddress
+//   ]);
+
+//   log("fetchCurrentPairUSDPrice === usd");
+//   log(contractMethod);
+
+//   return contractMethod[0];
+// };
+
 // await useContract(
 //   "0xe011EC515c0E70094c8b4D5c9d36d3b499D9532d",
 //   "0x7f11f79DEA8CE904ed0249a23930f2e59b43a385",

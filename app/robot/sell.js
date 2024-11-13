@@ -158,17 +158,19 @@ export const sendPnl = async (ctx) => {
     const userTrade = currentUser.trades[userStateTrade.toLowerCase()];
 
     log("user current user trade ======");
-    log(currentUser);
+    // log(currentUser);
 
     log("user state trade ======");
-    log(userTrade);
+    // log(userTrade);
 
     const tokenI = await tokenInfo(userStateTrade);
     const imageUrl = await generateImage(
       `${truncateText(userTrade?.tokenName)} / BROCK`,
       "| SELL",
-      userTrade.entryPrice,
-      tokenI.attributes.price_usd
+      Number(userTrade.entryPrice),
+      Number(tokenI.attributes.price_usd),
+      Number(userTrade?.amount),
+      Number(userTrade?.brockEntryPrice)
     );
 
     await ctx.replyWithPhoto(imageUrl.data.download_url_png);

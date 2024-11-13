@@ -17,10 +17,17 @@ export const generateImage = async (
   pair,
   tradeAction,
   initialPrice,
-  currentPrice
+  currentPrice,
+  amount_bought,
+  brock_entry_price
 ) => {
   log(pair, tradeAction, initialPrice, currentPrice);
   const percentage = calculatePercentageChange(initialPrice, currentPrice);
+
+  const initialInvestmentUSD = amount_bought * brock_entry_price;
+  const currentValueUSD = initialInvestmentUSD * (currentPrice / initialPrice);
+  const currentValueBROCK = currentValueUSD / brock_entry_price;
+
   const response = await axios.post(
     "https://rest.apitemplate.io/v2/create-image?template_id=27d77b23b5f7e5a0",
     {
@@ -66,13 +73,13 @@ export const generateImage = async (
         },
         {
           name: "amount_bought",
-          text: `$${initialPrice}`,
+          text: `${Number(amount_bought).toFixed(4)}`,
           textBackgroundColor: "rgba(0, 0, 0, 0)",
           color: "#FFFFFF"
         },
         {
           name: "text_3",
-          text: `${currentPrice}`,
+          text: `${Number(currentValueBROCK).toFixed(4)}`,
           textBackgroundColor: "rgba(0, 0, 0, 0)",
           color: isNegative(percentage) ? "#FF4D4D" : "#56E92D"
         },
@@ -82,13 +89,13 @@ export const generateImage = async (
         },
         {
           name: "invested_value_usd",
-          text: "$50.50",
+          text: `$${Number(initialPrice).toFixed(5)}`,
           textBackgroundColor: "rgba(0, 0, 0, 0)",
           color: "#FFFFFF"
         },
         {
           name: "current_value_usd",
-          text: "$50.50",
+          text: `$${Number(currentPrice).toFixed(5)}`,
           textBackgroundColor: "rgba(0, 0, 0, 0)",
           color: isNegative(percentage) ? "#FF4D4D" : "#56E92D"
         },

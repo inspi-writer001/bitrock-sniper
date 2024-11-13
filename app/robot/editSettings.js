@@ -1,6 +1,6 @@
 import axios from "axios";
 import { buyTrade } from "../controllers/buy.js";
-import { swapBack, useContract } from "../controllers/contract/swap.js";
+import { swapBack, useContract, WETH } from "../controllers/contract/swap.js";
 import { decrypt, encrypt } from "../controllers/encryption.js";
 import {
   buyDB,
@@ -34,7 +34,11 @@ import {
 } from "../index.js";
 import { log, err } from "../utils/globals.js";
 import { isWalletValid } from "../utils/isWalletValid.js";
-import { buyMessage, fastKeyboard, withdrawYesorNo } from "../utils/keyboards.js";
+import {
+  buyMessage,
+  fastKeyboard,
+  withdrawYesorNo
+} from "../utils/keyboards.js";
 import { Markup } from "telegraf";
 import { findUser } from "../database/users.js";
 import {
@@ -44,6 +48,7 @@ import {
 } from "../database/preSnipe.js";
 import { fetchTokenDetails } from "../controllers/moralis/moralis.js";
 import { verifyPremiumCode } from "../database/premium.js";
+import { tokenPrice } from "../utils/prices.js";
 
 // bot.action("editMinMCap", async (ctx) => {
 //   log("hit");
@@ -95,7 +100,8 @@ export const pendingSettings = async () => {
           await editBuyAmount(username, Number(text));
           const user = await findUser(username);
           await ctx.replyWithHTML(
-            `<i> buyAmount set to ${text}${user.buyType == 0 ? "%" : "BROCK"
+            `<i> buyAmount set to ${text}${
+              user.buyType == 0 ? "%" : "BROCK"
             }</i>`
           );
           delete buySettingsState[username];
@@ -143,24 +149,25 @@ export const pendingSettings = async () => {
         await ctx.replyWithHTML(`<i> enter a valid number </i>`);
       }
 
-
-
       if (premiumSettingsState[username]) {
         await verifyPremiumCode(text, username, ctx);
         delete premiumSettingsState[username];
       }
 
       //  add recepient wallet address to object
-      isWalletValid(text) && withdrawState.hasOwnProperty(username) && (
-        async () => {
+      isWalletValid(text) &&
+        withdrawState.hasOwnProperty(username) &&
+        (async () => {
           withdrawState[username].toWalletAddress = text;
-          await ctx.replyWithHTML(`<i> enter amount -- enter a valid number: </i>`);
-        }
-      )()
+          await ctx.replyWithHTML(
+            `<i> enter amount -- enter a valid number: </i>`
+          );
+        })();
 
       // popup token info
       isWalletValid(text) &&
-        !preSniper.hasOwnProperty(username) && !withdrawState.hasOwnProperty(username) &&
+        !preSniper.hasOwnProperty(username) &&
+        !withdrawState.hasOwnProperty(username) &&
         buyTrade(text, ctx, username);
 
       isWalletValid(text) &&
@@ -171,17 +178,31 @@ export const pendingSettings = async () => {
       log("=== custom value from user === " + username);
       log(customValue);
 
-      if (withdrawState[username] && withdrawState[username].toWalletAddress && parseFloat(text)) {
-        withdrawState[username].amount = Number(text)
+      if (
+        withdrawState[username] &&
+        withdrawState[username].toWalletAddress &&
+        parseFloat(text)
+      ) {
+        withdrawState[username].amount = Number(text);
 
-        let currentUserForTransfer = await findUser(username)
-        let defaultWalletAddress = currentUserForTransfer.walletAddress
-        let defaultEncryptedPrivateKey = currentUserForTransfer.encrypted_mnemonnics
+        let currentUserForTransfer = await findUser(username);
+        let defaultWalletAddress = currentUserForTransfer.walletAddress;
+        let defaultEncryptedPrivateKey =
+          currentUserForTransfer.encrypted_mnemonnics;
 
-        withdrawState[username].fromWalletAddress = defaultWalletAddress
-        withdrawState[username].encrypted_mnemonnics = defaultEncryptedPrivateKey
+        withdrawState[username].fromWalletAddress = defaultWalletAddress;
+        withdrawState[username].encrypted_mnemonnics =
+          defaultEncryptedPrivateKey;
 
-        await ctx.replyWithHTML(`<b> hold on 🦍 </b>\n<i>Are you sure you want to withdraw ${withdrawState[username].amount} BROCK to ${truncateText(withdrawState[username].toWalletAddress, 7)} ? </i>`, withdrawYesorNo)
+        await ctx.replyWithHTML(
+          `<b> hold on 🦍 </b>\n<i>Are you sure you want to withdraw ${
+            withdrawState[username].amount
+          } BROCK to ${truncateText(
+            withdrawState[username].toWalletAddress,
+            7
+          )} ? </i>`,
+          withdrawYesorNo
+        );
       }
 
       preSniper[username]?.state &&
@@ -214,7 +235,7 @@ export const pendingSettings = async () => {
       usersAwaitingAmount.includes(username)
         ? await customBuyForSpecificUser(username, customValue, ctx)
         : usersAwaitingSell.includes(username) &&
-        (await customSellForSpecificUser(username, customValue, ctx));
+          (await customSellForSpecificUser(username, customValue, ctx));
     } catch (error) {
       log("========= from general pendingSetting try catch =========");
       err(error);
@@ -237,10 +258,14 @@ const customBuyForSpecificUser = async (username, customValue, ctx) => {
   // await ctx.reply("processing tx ⚡️ ==========");
   // await ctx.reply("processing gas ⛽️ ==========");
 
+  // how to remove link preview 🔥🔥🔥🔥🔥🔥🔥🔥🔥
+
   const currentUser = await findUser(username);
   const message = await ctx.replyWithHTML(
-    `🔘 Submitting Transaction || Wallet ${currentUser.defaultAddress + 1
-    } <a href="https://explorer.bit-rock.io/address/${currentUser.walletAddress
+    `🔘 Submitting Transaction || Wallet ${
+      currentUser.defaultAddress + 1
+    } <a href="https://explorer.bit-rock.io/address/${
+      currentUser.walletAddress
     }">${currentUser.walletAddress}</a>`,
     {
       link_preview_options: {
@@ -248,6 +273,8 @@ const customBuyForSpecificUser = async (username, customValue, ctx) => {
       }
     }
   );
+
+  const tokenEquivalentBrockUSD = await tokenPrice(WETH);
 
   // TODO remove test contract address
 
@@ -269,16 +296,21 @@ const customBuyForSpecificUser = async (username, customValue, ctx) => {
       state[username].trade.amount,
       state[username].trade.entryPrice,
       state[username].trade.entryMCAP,
-      state[username].trade.coinName
+      state[username].trade.coinName,
+      tokenEquivalentBrockUSD
     );
 
     await ctx.deleteMessage(message.message_id);
 
     await ctx.replyWithHTML(
-      `<b>📝 Transaction Approved || You bought approx. </b> <a href="https://explorer.bit-rock.io/tx/${result.hash
-      }">${Number(result.amountOut).toFixed(2)} $${state[username].trade.coinName
-      } for ${state[username].trade.amount} $BROCK</a> || 💳 Wallet ${currentUser.defaultAddress + 1
-      } <a href="https://explorer.bit-rock.io/address/${currentUser.walletAddress
+      `<b>📝 Transaction Approved || You bought approx. </b> <a href="https://explorer.bit-rock.io/tx/${
+        result.hash
+      }">${Number(result.amountOut).toFixed(2)} $${
+        state[username].trade.coinName
+      } for ${state[username].trade.amount} $BROCK</a> || 💳 Wallet ${
+        currentUser.defaultAddress + 1
+      } <a href="https://explorer.bit-rock.io/address/${
+        currentUser.walletAddress
       }">${currentUser.walletAddress}</a>`,
       {
         link_preview_options: {
@@ -316,8 +348,10 @@ export const customSellForSpecificUser = async (username, customValue, ctx) => {
   log("running custom sell ==========");
   const currentUser = await findUser(username);
   const message = await ctx.replyWithHTML(
-    `🔘 Submitting Transaction || Wallet ${currentUser.defaultAddress + 1
-    } <a href="https://explorer.bit-rock.io/address/${currentUser.walletAddress
+    `🔘 Submitting Transaction || Wallet ${
+      currentUser.defaultAddress + 1
+    } <a href="https://explorer.bit-rock.io/address/${
+      currentUser.walletAddress
     }">${currentUser.walletAddress}</a>`,
     {
       link_preview_options: {
@@ -348,12 +382,16 @@ export const customSellForSpecificUser = async (username, customValue, ctx) => {
     await ctx.deleteMessage(message.message_id);
 
     await ctx.replyWithHTML(
-      `<b>📝 Transaction Approved || You sold </b> <a href="https://explorer.bit-rock.io/tx/${result.hash
-      }">${result.amount} $${sellState[username].trade.coinName
+      `<b>📝 Transaction Approved || You sold </b> <a href="https://explorer.bit-rock.io/tx/${
+        result.hash
+      }">${result.amount} $${
+        sellState[username].trade.coinName
       } for approx. ${Number(result.amountOut).toFixed(
         2
-      )} $BROCK</a> || 💳 Wallet ${currentUser.defaultAddress + 1
-      } <a href="https://explorer.bit-rock.io/address/${result.hash}">${currentUser.walletAddress
+      )} $BROCK</a> || 💳 Wallet ${
+        currentUser.defaultAddress + 1
+      } <a href="https://explorer.bit-rock.io/address/${result.hash}">${
+        currentUser.walletAddress
       }</a>`,
       {
         link_preview_options: {
@@ -407,7 +445,8 @@ export const sellCallBackQuery = async (ctx) => {
     const switchingKeyboard = Markup.inlineKeyboard([
       Markup.button.callback(`⏪ Prev`, `prev`),
       Markup.button.callback(
-        `${selectToken[username].tokens[selectToken[username].tokenIndex].name
+        `${
+          selectToken[username].tokens[selectToken[username].tokenIndex].name
         }`,
         `${selectToken[username].tokens[
           selectToken[username].tokenIndex
@@ -440,13 +479,18 @@ export const sellCallBackQuery = async (ctx) => {
         ctx.chat.id,
         selectPreSnipes[username].messageId,
         null,
-        `<b>🌕️ ${token[0].name || ""} ($${token[0].symbol || ""
-        })</b>\n🪅 <b>CA</b>: <code>${token[0].address || ""
-        }</code>\n 💧 <b>Status</b>: Pending \n\nTotal Pending: ${selectPreSnipes[username].max + 1
-        }\n💵 <b>Amount</b>: ${selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
-          .amount || 0
-        } $BROCK\n💳️ <b>Wallet</b> ${selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
-          .walletIndex || "-"
+        `<b>🌕️ ${token[0].name || ""} ($${
+          token[0].symbol || ""
+        })</b>\n🪅 <b>CA</b>: <code>${
+          token[0].address || ""
+        }</code>\n 💧 <b>Status</b>: Pending \n\nTotal Pending: ${
+          selectPreSnipes[username].max + 1
+        }\n💵 <b>Amount</b>: ${
+          selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
+            .amount || 0
+        } $BROCK\n💳️ <b>Wallet</b> ${
+          selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
+            .walletIndex || "-"
         }`,
         {
           parse_mode: "HTML",
@@ -478,13 +522,18 @@ export const sellCallBackQuery = async (ctx) => {
         ctx.chat.id,
         selectPreSnipes[username].messageId,
         null,
-        `<b>🌕️ ${token[0].name || ""} ($${token[0].symbol || ""
-        })</b>\n🪅 <b>CA</b>: <code>${token[0].address || ""
-        }</code>\n💧 <b>Status</b>: Pending \n\nTotal Pending: ${selectPreSnipes[username].max + 1
-        }\n💵 <b>Amount</b>: ${selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
-          .amount || 0
-        } $BROCK\n💳️ <b>Wallet</b> ${selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
-          .walletIndex || "-"
+        `<b>🌕️ ${token[0].name || ""} ($${
+          token[0].symbol || ""
+        })</b>\n🪅 <b>CA</b>: <code>${
+          token[0].address || ""
+        }</code>\n💧 <b>Status</b>: Pending \n\nTotal Pending: ${
+          selectPreSnipes[username].max + 1
+        }\n💵 <b>Amount</b>: ${
+          selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
+            .amount || 0
+        } $BROCK\n💳️ <b>Wallet</b> ${
+          selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
+            .walletIndex || "-"
         }`,
         {
           parse_mode: "HTML",
@@ -507,8 +556,9 @@ export const sellCallBackQuery = async (ctx) => {
           .tokenContractAddress
       );
       await ctx.reply(
-        `🔥 Snipe Position for ${selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
-          .tokenContractAddress
+        `🔥 Snipe Position for ${
+          selectPreSnipes[username].tokens[selectPreSnipes[username].tokenIndex]
+            .tokenContractAddress
         } closed ✔️`
       );
     }
@@ -516,7 +566,7 @@ export const sellCallBackQuery = async (ctx) => {
 
     // TODO  remove test UnityBot wallet address
     isWalletValid(userInput) && (await buyTrade(userInput, ctx, true));
-  } catch (error) { }
+  } catch (error) {}
 };
 
 // / to trigger build

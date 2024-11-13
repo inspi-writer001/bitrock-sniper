@@ -239,7 +239,8 @@ export const buyDB = async (
   amount,
   entryPrice,
   entryMCAP,
-  tokenName
+  tokenName,
+  brockEntryPrice
 ) => {
   const user = await User.findOne({ username: telegramId });
   if (user) {
@@ -249,7 +250,8 @@ export const buyDB = async (
       entryPrice,
       entryMCAP,
       amount,
-      tokenName
+      tokenName,
+      brockEntryPrice
     };
 
     log("user trades after pushing =======");

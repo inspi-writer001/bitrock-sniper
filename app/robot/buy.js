@@ -3,9 +3,10 @@ import { findUser } from "../database/users.js";
 import { buyAddress, state, usersAwaitingAmount } from "../index.js";
 import { err, log } from "../utils/globals.js";
 import { txError } from "../errors/txError.js";
-import { useContract } from "../controllers/contract/swap.js";
+import { useContract, WETH } from "../controllers/contract/swap.js";
 import { buyDB } from "../controllers/settings.js";
 import { truncateText } from "./sell.js";
+import { tokenPrice } from "../utils/prices.js";
 
 export const buy = async (ctx) => {
   try {
@@ -83,6 +84,7 @@ export const buy = async (ctx) => {
         currentUser.slippage ? currentUser.slippage : ""
       );
 
+      const tokenEquivalentBrockUSD = await tokenPrice(WETH);
       log(" === hitting buydb for user -- normal buy ===");
       await buyDB(
         user,
@@ -90,7 +92,8 @@ export const buy = async (ctx) => {
         amountToBuy,
         response.attributes["price_usd"],
         response.attributes["fdv_usd"],
-        response.attributes.name
+        response.attributes.name,
+        tokenEquivalentBrockUSD
       );
       await ctx.deleteMessage(message.message_id);
       await ctx.replyWithHTML(
